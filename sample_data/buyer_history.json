@@ -1,0 +1,26 @@
+[
+  {
+    "buyer_name": "Reliance Industries Ltd",
+    "total_bills": 120,
+    "paid_on_time": 114,
+    "avg_delay_days": 2
+  },
+  {
+    "buyer_name": "Tata Consultancy Services Ltd",
+    "total_bills": 100,
+    "paid_on_time": 95,
+    "avg_delay_days": 3
+  },
+  {
+    "buyer_name": "Infosys Technologies Ltd",
+    "total_bills": 80,
+    "paid_on_time": 76,
+    "avg_delay_days": 2
+  },
+  {
+    "buyer_name": "Slowpay Retail Pvt Ltd",
+    "total_bills": 50,
+    "paid_on_time": 20,
+    "avg_delay_days": 45
+  }
+]

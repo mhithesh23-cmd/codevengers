@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verification Report — InvoiceTrust</title>
+    <meta name="description" content="Detailed invoice-financing risk assessment and multi-way document verification report." />
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/src/liquid-glass.css" />
+  </head>
+  <body class="bg-[#070B14] text-slate-100 min-h-screen relative selection:bg-emerald-500/30 selection:text-emerald-200">
+    <!-- Ambient ambient lights -->
+    <div class="ambient-bg" aria-hidden="true">
+      <div class="ambient-orb-1"></div>
+      <div class="ambient-orb-2"></div>
+      <div class="ambient-orb-3"></div>
+    </div>
+
+    <!-- Floating Navigation Bar -->
+    <header class="fixed top-4 left-0 right-0 z-40 px-4 sm:px-6 max-w-7xl mx-auto no-print">
+      <nav class="liquid-nav rounded-2xl px-5 py-3.5 flex items-center justify-between gap-6 shadow-2xl">
+        <a href="index.html" class="flex items-center gap-3 shrink-0 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)] border border-white/20">
+            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-base font-bold tracking-tight text-white flex items-center gap-1.5">
+              InvoiceTrust
+              <span class="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">Report</span>
+            </span>
+            <span class="text-[11px] text-slate-400 font-medium">Risk & Verification Dossier</span>
+          </div>
+        </a>
+
+        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+          <a href="index.html" class="hover:text-white transition-colors">New Verification</a>
+          <a href="dashboard.html" class="hover:text-white transition-colors">Lender Dashboard</a>
+          <a id="nav-audit-link" href="audit.html" class="hover:text-white transition-colors">Audit Trail</a>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <button type="button" onclick="window.print()" class="btn-liquid-secondary px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            <span class="hidden sm:inline">Print / Export PDF</span>
+          </button>
+          <a href="index.html" class="btn-liquid-primary px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+            <span>+ New Verify</span>
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 pt-28 pb-20 px-4 sm:px-6 max-w-7xl mx-auto space-y-8">
+      
+      <!-- Back Link & Header Title -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+        <div>
+          <div class="flex items-center gap-2 text-xs text-slate-400 mb-1">
+            <a href="dashboard.html" class="hover:text-emerald-400 transition-colors flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+              Lender Ledger
+            </a>
+            <span>/</span>
+            <span id="breadcrumb-id" class="text-slate-200 font-mono-numbers">--</span>
+            <span>/</span>
+            <span class="text-emerald-400">Risk Assessment Dossier</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+            <span id="header-invoice-title">Verification Report</span>
+            <span id="data-source-badge" class="text-[11px] font-semibold uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+              Verified
+            </span>
+          </h1>
+        </div>
+
+        <!-- Real-time Action Sync Status -->
+        <div id="backend-sync-alert" class="px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs text-slate-300 flex items-center gap-2 self-start sm:self-auto font-mono-numbers">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="backend-sync-text">Live Sync · FastAPI Engine</span>
+        </div>
+      </div>
+
+      <!-- Top Row: Risk Score Gauge + Decision Badge + Executive Summary -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Risk Gauge & Decision Badge Card (5 Cols) -->
+        <div class="lg:col-span-5 glass-panel-elevated rounded-3xl p-6 sm:p-8 flex flex-col justify-between border border-white/10 space-y-6">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Risk Score Analysis</span>
+            <span id="risk-category-badge" class="text-xs font-bold px-2.5 py-0.5 rounded-full">--</span>
+          </div>
+
+          <!-- Circular Liquid SVG Gauge -->
+          <div class="relative flex flex-col items-center justify-center my-2">
+            <svg class="w-48 h-48 transform -rotate-90" viewBox="0 0 120 120">
+              <!-- Background track -->
+              <circle cx="60" cy="60" r="48" stroke="rgba(255, 255, 255, 0.08)" stroke-width="10" fill="transparent" />
+              <!-- Animated Progress Path -->
+              <circle id="gauge-circle" cx="60" cy="60" r="48" stroke="#10B981" stroke-width="10" stroke-linecap="round" fill="transparent" stroke-dasharray="301.59" stroke-dashoffset="301.59" class="gauge-meter-path" />
+            </svg>
+            
+            <!-- Gauge Center Values -->
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+              <span id="gauge-score-value" class="text-5xl font-extrabold text-white font-mono-numbers tracking-tight">0</span>
+              <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Out of 100</span>
+            </div>
+          </div>
+
+          <!-- Decision Badge Panel -->
+          <div id="decision-container" class="rounded-2xl p-4 border text-center transition-all">
+            <div class="flex items-center justify-center gap-2 mb-1">
+              <span id="decision-icon"></span>
+              <span id="decision-text" class="text-lg font-extrabold tracking-wider uppercase">Evaluating</span>
+            </div>
+            <p id="decision-description" class="text-xs leading-relaxed text-slate-300">
+              Analyzing consistency across invoices, purchase orders, and delivery slips.
+            </p>
+          </div>
+
+          <p class="text-[11px] text-slate-500 leading-relaxed text-center">
+            *Risk scores represent algorithmic decision-support signals. Decision is based on 8 core validation checks.
+          </p>
+        </div>
+
+        <!-- Invoice Summary & Financial Parameters Card (7 Cols) -->
+        <div class="lg:col-span-7 glass-panel-elevated rounded-3xl p-6 sm:p-8 flex flex-col justify-between border border-white/10 space-y-6">
+          <div class="border-b border-white/10 pb-4 flex items-center justify-between">
+            <div>
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Transaction Summary</span>
+              <h2 id="sum-seller-name" class="text-xl font-bold text-white mt-0.5">--</h2>
+              <p id="sum-buyer-name" class="text-xs text-slate-300">Billing to: --</p>
+            </div>
+            <div class="text-right">
+              <span class="text-[11px] text-slate-400">Current Status</span>
+              <div id="sum-status-badge" class="mt-0.5 text-xs font-bold px-3 py-1 rounded-full inline-block">--</div>
+            </div>
+          </div>
+
+          <!-- Metric Cards Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+            <div class="glass-panel-subtle rounded-2xl p-3.5 border border-white/5">
+              <span class="text-[11px] text-slate-400 block">Invoice Total</span>
+              <span id="sum-inv-amount" class="text-lg font-bold text-white font-mono-numbers block mt-1">₹0</span>
+              <span class="text-[10px] text-slate-400">Gross billing</span>
+            </div>
+
+            <div class="glass-panel-subtle rounded-2xl p-3.5 border border-white/5">
+              <span class="text-[11px] text-slate-400 block">Eligible Financing</span>
+              <span id="sum-req-amount" class="text-lg font-bold text-emerald-400 font-mono-numbers block mt-1">₹0</span>
+              <span class="text-[10px] text-slate-400">80% LTV standard</span>
+            </div>
+
+            <div class="glass-panel-subtle rounded-2xl p-3.5 border border-white/5">
+              <span class="text-[11px] text-slate-400 block">Invoice Number</span>
+              <span id="sum-inv-number" class="text-sm font-bold text-white font-mono-numbers block mt-1.5 truncate">--</span>
+              <span class="text-[10px] text-slate-400">Identifier</span>
+            </div>
+
+            <div class="glass-panel-subtle rounded-2xl p-3.5 border border-white/5">
+              <span class="text-[11px] text-slate-400 block">Invoice Date</span>
+              <span id="sum-due-date" class="text-sm font-semibold text-white block mt-1.5 font-mono-numbers">--</span>
+              <span class="text-[10px] text-slate-400">Payment date</span>
+            </div>
+
+            <div class="glass-panel-subtle rounded-2xl p-3.5 border border-white/5">
+              <span class="text-[11px] text-slate-400 block">Verification Timestamp</span>
+              <span id="sum-timestamp" class="text-xs font-semibold text-white block mt-1.5 font-mono-numbers truncate">--</span>
+              <span class="text-[10px] text-slate-400">Audit logged</span>
+            </div>
+
+            <div class="glass-panel-subtle rounded-2xl p-3.5 border border-white/5">
+              <span class="text-[11px] text-slate-400 block">Cryptographic Check</span>
+              <span id="sum-crypto-status" class="text-xs font-semibold text-white block mt-1.5 flex items-center gap-1 text-emerald-400">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                SHA-256 Intact
+              </span>
+              <span class="text-[10px] text-slate-400">Off-chain storage verified</span>
+            </div>
+          </div>
+
+          <!-- Cryptographic Fingerprint & File Hash Display -->
+          <div class="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-2 text-xs">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <span class="text-slate-400 font-mono uppercase text-[10px]">Invoice File SHA-256 Hash:</span>
+              <span id="sum-file-hash" class="font-mono text-emerald-300 break-all select-all">--</span>
+            </div>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pt-1 border-t border-white/5">
+              <span class="text-slate-400 font-mono uppercase text-[10px]">Deterministic Fingerprint:</span>
+              <span id="sum-fingerprint" class="font-mono text-cyan-300 break-all select-all">--</span>
+            </div>
+          </div>
+
+          <!-- Lender Fast Actions Toolbar -->
+          <div class="pt-4 border-t border-white/10 no-print flex flex-wrap items-center justify-between gap-3">
+            <span class="text-xs font-semibold text-slate-400">Lender Actions:</span>
+            
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" id="btn-action-approve" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 transition-all flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Approve & Fund
+              </button>
+
+              <button type="button" id="btn-action-paid" class="px-4 py-2 rounded-xl text-xs font-bold bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/40 transition-all flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Mark Paid
+              </button>
+
+              <a id="btn-view-audit" href="audit.html" class="px-3.5 py-2 rounded-xl text-xs font-medium bg-white/10 hover:bg-white/15 text-white border border-white/10 transition-colors flex items-center gap-1">
+                Audit Trail →
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Verification Checks Checklist Section -->
+      <section class="glass-panel-elevated rounded-3xl p-6 sm:p-8 border border-white/10 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Automated Verification Checks</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Full multi-point evaluation covering duplicate detection, PO match, delivery receipt, and risk limits.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="filter-check-all" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 text-white">All</button>
+            <button id="filter-check-failed" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white">Anomalies</button>
+            <button id="filter-check-passed" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white">Passed</button>
+          </div>
+        </div>
+
+        <div id="checklist-container" class="space-y-3">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+    </main>
+
+    <script src="/src/invoicetrust.js"></script>
+    <script>
+      let currentInvoice = null;
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const invId = urlParams.get("id");
+
+        if (invId) {
+          currentInvoice = await window.InvoiceTrustDB.getById(invId);
+        } else {
+          const all = await window.InvoiceTrustDB.getAll();
+          currentInvoice = all[0];
+        }
+
+        renderInvoiceReport(currentInvoice);
+
+        // Actions
+        document.getElementById("btn-action-approve").addEventListener("click", async () => {
+          if (!currentInvoice) return;
+          try {
+            await window.InvoiceTrustAPI.approve(currentInvoice.id);
+            window.showToast("Invoice marked as Funded!", "success");
+            currentInvoice = await window.InvoiceTrustDB.getById(currentInvoice.id);
+            renderInvoiceReport(currentInvoice);
+          } catch (e) {
+            window.showToast(`Error: ${e.message}`, "error");
+          }
+        });
+
+        document.getElementById("btn-action-paid").addEventListener("click", async () => {
+          if (!currentInvoice) return;
+          try {
+            await window.InvoiceTrustAPI.markPaid(currentInvoice.id);
+            window.showToast("Invoice marked as Paid!", "success");
+            currentInvoice = await window.InvoiceTrustDB.getById(currentInvoice.id);
+            renderInvoiceReport(currentInvoice);
+          } catch (e) {
+            window.showToast(`Error: ${e.message}`, "error");
+          }
+        });
+
+        document.getElementById("filter-check-all").addEventListener("click", () => filterChecklist("all"));
+        document.getElementById("filter-check-failed").addEventListener("click", () => filterChecklist("failed"));
+        document.getElementById("filter-check-passed").addEventListener("click", () => filterChecklist("passed"));
+      });
+
+      function renderInvoiceReport(inv) {
+        if (!inv) return;
+
+        document.getElementById("breadcrumb-id").textContent = inv.invoiceNumber;
+        document.getElementById("header-invoice-title").textContent = `Invoice ${inv.invoiceNumber} — Verification Report`;
+        document.getElementById("btn-view-audit").href = `audit.html?id=${encodeURIComponent(inv.id)}`;
+        document.getElementById("nav-audit-link").href = `audit.html?id=${encodeURIComponent(inv.id)}`;
+
+        document.getElementById("sum-seller-name").textContent = inv.sellerName;
+        document.getElementById("sum-buyer-name").textContent = `Debtor: ${inv.buyerName}`;
+        document.getElementById("sum-inv-amount").textContent = window.formatINR(inv.invoiceAmount);
+        document.getElementById("sum-req-amount").textContent = window.formatINR(inv.requestedAmount);
+        document.getElementById("sum-inv-number").textContent = inv.invoiceNumber;
+        document.getElementById("sum-due-date").textContent = inv.dueDate || "Recent";
+        document.getElementById("sum-timestamp").textContent = new Date(inv.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
+
+        document.getElementById("sum-file-hash").textContent = inv.fileHash || "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+        document.getElementById("sum-fingerprint").textContent = inv.fingerprint || "None";
+
+        const statusBadge = document.getElementById("sum-status-badge");
+        if (inv.status === "Approved" || inv.status === "Funded") {
+          statusBadge.className = "mt-0.5 text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+          statusBadge.textContent = inv.status;
+        } else if (inv.status === "Rejected") {
+          statusBadge.className = "mt-0.5 text-xs font-bold px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30";
+          statusBadge.textContent = "Rejected";
+        } else {
+          statusBadge.className = "mt-0.5 text-xs font-bold px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30";
+          statusBadge.textContent = inv.status;
+        }
+
+        renderRiskGauge(inv.riskScore, inv.decision);
+        renderChecklist(inv.checklist || []);
+      }
+
+      function renderRiskGauge(score, decision) {
+        const scoreEl = document.getElementById("gauge-score-value");
+        const circle = document.getElementById("gauge-circle");
+        const categoryBadge = document.getElementById("risk-category-badge");
+        const decisionContainer = document.getElementById("decision-container");
+        const decisionText = document.getElementById("decision-text");
+        const decisionIcon = document.getElementById("decision-icon");
+        const decisionDesc = document.getElementById("decision-description");
+
+        const circumference = 301.59;
+        const offset = circumference - (score / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+        scoreEl.textContent = score;
+
+        if (score > 60 || decision === "REJECT") {
+          circle.style.stroke = "#F43F5E";
+          categoryBadge.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40";
+          categoryBadge.textContent = `HIGH RISK (${score}/100)`;
+          decisionContainer.className = "rounded-2xl p-4 border bg-rose-500/10 border-rose-500/30 text-rose-300";
+          decisionText.textContent = "RECOMMENDED DECISION: REJECT";
+          decisionIcon.innerHTML = `<svg class="w-6 h-6 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>`;
+          decisionDesc.textContent = "Significant risk anomalies or duplicate financing detected. Disbursal blocked.";
+        } else if (score >= 30 || decision === "REVIEW") {
+          circle.style.stroke = "#F59E0B";
+          categoryBadge.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40";
+          categoryBadge.textContent = `MODERATE RISK (${score}/100)`;
+          decisionContainer.className = "rounded-2xl p-4 border bg-amber-500/10 border-amber-500/30 text-amber-300";
+          decisionText.textContent = "RECOMMENDED DECISION: REVIEW";
+          decisionIcon.innerHTML = `<svg class="w-6 h-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01"/></svg>`;
+          decisionDesc.textContent = "Discrepancy observed (e.g. amount variance, missing delivery, or risky buyer history). Requires manual loan review.";
+        } else {
+          circle.style.stroke = "#10B981";
+          categoryBadge.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+          categoryBadge.textContent = `LOW RISK (${score}/100)`;
+          decisionContainer.className = "rounded-2xl p-4 border bg-emerald-500/10 border-emerald-500/30 text-emerald-300";
+          decisionText.textContent = "RECOMMENDED DECISION: APPROVE";
+          decisionIcon.innerHTML = `<svg class="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`;
+          decisionDesc.textContent = "All core verification criteria passed. Documents cross-checked and ready for financing.";
+        }
+      }
+
+      function renderChecklist(checklist) {
+        const container = document.getElementById("checklist-container");
+        container.innerHTML = "";
+
+        checklist.forEach((item, idx) => {
+          const row = document.createElement("div");
+          const isPassed = item.status === "passed";
+          const borderClass = isPassed ? "border-emerald-500/20 bg-emerald-500/[0.02]" : "border-rose-500/30 bg-rose-500/[0.05]";
+          const badgeHtml = isPassed 
+            ? `<span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                ✅ PASSED
+              </span>`
+            : `<span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30 flex items-center gap-1">
+                ❌ FAILED (+${item.weight || 0} Risk)
+              </span>`;
+
+          row.className = `p-4 rounded-2xl border ${borderClass} transition-all space-y-2 checklist-item data-status-${item.status}`;
+          row.innerHTML = `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center gap-2.5">
+                <span class="text-xs font-mono text-slate-500 font-semibold w-5">${idx + 1}.</span>
+                <span class="text-sm font-semibold text-white">${item.name}</span>
+              </div>
+              <div class="shrink-0">${badgeHtml}</div>
+            </div>
+            <p class="text-xs text-slate-300 pl-7 leading-relaxed">${item.reason}</p>
+          `;
+          container.appendChild(row);
+        });
+      }
+
+      function filterChecklist(filter) {
+        const items = document.querySelectorAll(".checklist-item");
+        items.forEach(el => {
+          if (filter === "all") el.classList.remove("hidden");
+          else if (filter === "passed") el.classList.toggle("hidden", !el.classList.contains("data-status-passed"));
+          else if (filter === "failed") el.classList.toggle("hidden", el.classList.contains("data-status-passed"));
+        });
+      }
+    </script>
+  </body>
+</html>

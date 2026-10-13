@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Audit Trail & Cryptographic Integrity — InvoiceTrust</title>
+    <meta name="description" content="Immutable cryptographic audit trail, SHA-256 document verification, and forensic lifecycle logs." />
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/src/liquid-glass.css" />
+  </head>
+  <body class="bg-[#070B14] text-slate-100 min-h-screen relative selection:bg-emerald-500/30 selection:text-emerald-200">
+    <!-- Ambient ambient lights -->
+    <div class="ambient-bg" aria-hidden="true">
+      <div class="ambient-orb-1"></div>
+      <div class="ambient-orb-2"></div>
+      <div class="ambient-orb-3"></div>
+    </div>
+
+    <!-- Floating Navigation Bar -->
+    <header class="fixed top-4 left-0 right-0 z-40 px-4 sm:px-6 max-w-7xl mx-auto no-print">
+      <nav class="liquid-nav rounded-2xl px-5 py-3.5 flex items-center justify-between gap-6 shadow-2xl">
+        <a href="index.html" class="flex items-center gap-3 shrink-0 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)] border border-white/20">
+            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-base font-bold tracking-tight text-white flex items-center gap-1.5">
+              InvoiceTrust
+              <span class="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">Audit Chain</span>
+            </span>
+            <span class="text-[11px] text-slate-400 font-medium">SHA-256 Hash-Chain Audit</span>
+          </div>
+        </a>
+
+        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+          <a href="index.html" class="hover:text-white transition-colors">New Verification</a>
+          <a href="dashboard.html" class="hover:text-white transition-colors">Lender Dashboard</a>
+          <a href="audit.html" class="text-emerald-400 border-b border-emerald-400/80 pb-0.5 font-semibold transition-colors">Audit Trail</a>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <!-- Demo: Tamper Button -->
+          <button type="button" id="btn-demo-tamper" class="px-3 py-2 rounded-xl text-xs font-semibold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 transition-colors flex items-center gap-1.5" title="Demonstration: Alter storage file to simulate tampering">
+            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span>Demo: Tamper</span>
+          </button>
+
+          <!-- Verify Integrity Button -->
+          <button type="button" id="btn-verify-integrity" class="btn-liquid-primary px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span>Verify Integrity</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 pt-28 pb-20 px-4 sm:px-6 max-w-7xl mx-auto space-y-8">
+      
+      <!-- Top Title & Invoice Selection Dropdown -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Cryptographic Hash-Chain Audit Trail</h1>
+          <p class="text-xs text-slate-400 mt-1">
+            Tamper-evident SHA-256 blocks linking each state event (UPLOADED, VERIFIED, APPROVED, FUNDED, PAID).
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <label for="select-audit-invoice" class="text-xs text-slate-400 font-medium">Select Invoice Application:</label>
+          <select id="select-audit-invoice" class="px-3.5 py-2 rounded-xl bg-slate-900/80 border border-slate-700/80 text-white text-xs focus:outline-none focus:border-emerald-500">
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+      </div>
+
+      <!-- Verification Status Banner (Hidden by default, shown upon clicking Verify Integrity) -->
+      <div id="verify-status-banner" class="hidden rounded-3xl p-6 border transition-all">
+        <div class="flex items-center gap-4">
+          <div id="verify-status-icon" class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"></div>
+          <div class="flex-1">
+            <h2 id="verify-status-title" class="text-xl font-bold tracking-tight">--</h2>
+            <p id="verify-status-desc" class="text-xs mt-1 text-slate-300">--</p>
+          </div>
+        </div>
+        <div id="verify-problems-list" class="mt-4 pt-4 border-t border-white/10 hidden space-y-2 text-xs font-mono">
+          <!-- Problem items -->
+        </div>
+      </div>
+
+      <!-- Current Selected Invoice Overview Card -->
+      <section class="glass-panel-elevated rounded-3xl p-6 border border-white/10 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+          <div>
+            <span class="text-xs font-semibold text-slate-400 uppercase">Application Reference</span>
+            <h3 id="current-inv-title" class="text-lg font-bold text-white">--</h3>
+          </div>
+          <div class="text-xs text-slate-300">
+            Current Status: <span id="current-inv-status" class="font-bold text-emerald-400">--</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
+          <div class="p-3 rounded-xl bg-slate-900/70 border border-white/5 space-y-1">
+            <span class="text-[10px] text-slate-500 uppercase block">Stored Document SHA-256 Hash:</span>
+            <span id="current-inv-filehash" class="text-emerald-300 break-all select-all">--</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900/70 border border-white/5 space-y-1">
+            <span class="text-[10px] text-slate-500 uppercase block">Deterministic Fingerprint:</span>
+            <span id="current-inv-fp" class="text-cyan-300 break-all select-all">--</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chronological Audit Timeline Section -->
+      <section class="glass-panel-elevated rounded-3xl p-6 sm:p-8 border border-white/10 space-y-6">
+        <div class="border-b border-white/10 pb-4 flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Cryptographic Hash Blocks Timeline</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Chronological record of events computed via SHA-256 hash chaining.</p>
+          </div>
+          <span class="text-xs px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+            Tamper-Evident SHA-256
+          </span>
+        </div>
+
+        <div id="audit-timeline-container" class="space-y-4 pl-4 border-l-2 border-emerald-500/30">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+    </main>
+
+    <script src="/src/invoicetrust.js"></script>
+    <script>
+      let invoices = [];
+      let currentInvoice = null;
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        let invId = urlParams.get("id");
+
+        invoices = await window.InvoiceTrustDB.getAll();
+        populateInvoiceSelector(invoices, invId);
+
+        currentInvoice = invoices.find(i => String(i.id) === String(invId)) || invoices[0];
+        if (currentInvoice) {
+          await renderAuditPage(currentInvoice.id);
+        }
+
+        document.getElementById("select-audit-invoice").addEventListener("change", async (e) => {
+          const selected = invoices.find(i => String(i.id) === String(e.target.value));
+          if (selected) {
+            currentInvoice = selected;
+            await renderAuditPage(currentInvoice.id);
+          }
+        });
+
+        // Verify Integrity Button
+        document.getElementById("btn-verify-integrity").addEventListener("click", verifyIntegrityCheck);
+
+        // Demo: Tamper Button
+        document.getElementById("btn-demo-tamper").addEventListener("click", async () => {
+          if (!currentInvoice) return;
+          try {
+            await window.InvoiceTrustAPI.demoTamper(currentInvoice.id);
+            window.showToast(`Tampered storage file for ${currentInvoice.invoiceNumber}! Now click 'Verify Integrity'.`, "success");
+          } catch (e) {
+            window.showToast(`Tamper failed: ${e.message}`, "error");
+          }
+        });
+      });
+
+      function populateInvoiceSelector(invoicesList, currentId) {
+        const select = document.getElementById("select-audit-invoice");
+        select.innerHTML = "";
+
+        invoicesList.forEach(inv => {
+          const opt = document.createElement("option");
+          opt.value = inv.id;
+          opt.textContent = `${inv.invoiceNumber} — ${inv.sellerName} (${inv.status})`;
+          if (String(inv.id) === String(currentId)) opt.selected = true;
+          select.appendChild(opt);
+        });
+      }
+
+      async function renderAuditPage(invoiceId) {
+        try {
+          const inv = await window.InvoiceTrustDB.getById(invoiceId);
+          currentInvoice = inv;
+          if (!inv) return;
+
+          document.getElementById("current-inv-title").textContent = `${inv.invoiceNumber} (${inv.sellerName} → ${inv.buyerName})`;
+          document.getElementById("current-inv-status").textContent = inv.status;
+          document.getElementById("current-inv-filehash").textContent = inv.fileHash || "None";
+          document.getElementById("current-inv-fp").textContent = inv.fingerprint || "None";
+
+          // Fetch real audit events
+          const events = await window.InvoiceTrustAPI.getAudit(invoiceId);
+          const timeline = document.getElementById("audit-timeline-container");
+          timeline.innerHTML = "";
+
+          if (!events || events.length === 0) {
+            timeline.innerHTML = `<div class="text-xs text-slate-400 py-4">No audit events recorded yet for this invoice.</div>`;
+            return;
+          }
+
+          events.forEach(ev => {
+            const card = document.createElement("div");
+            card.className = "relative pl-6 py-2";
+            card.innerHTML = `
+              <div class="absolute -left-[25px] top-4 w-4 h-4 rounded-full bg-slate-900 border-2 border-emerald-400 flex items-center justify-center">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              </div>
+              <div class="p-4 rounded-2xl bg-slate-900/70 border border-white/10 hover:border-emerald-500/30 transition-all space-y-2">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <span class="text-sm font-bold text-white flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Block #${ev.id}</span>
+                    <span>Event: ${ev.event}</span>
+                  </span>
+                  <span class="text-[11px] font-mono text-slate-400">${new Date(ev.created_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "medium" })}</span>
+                </div>
+                
+                <div class="pt-2 border-t border-white/5 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono">
+                  <div class="bg-black/30 p-2 rounded-lg">
+                    <span class="text-slate-500 block text-[9px] uppercase">Previous Block Hash:</span>
+                    <span class="text-slate-400 break-all select-all">${ev.prev_hash}</span>
+                  </div>
+                  <div class="bg-black/30 p-2 rounded-lg">
+                    <span class="text-slate-500 block text-[9px] uppercase">Current Block SHA-256 Hash:</span>
+                    <span class="text-emerald-300 break-all select-all">${ev.hash}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+            timeline.appendChild(card);
+          });
+        } catch (e) {
+          console.error("renderAuditPage error:", e);
+        }
+      }
+
+      async function verifyIntegrityCheck() {
+        const banner = document.getElementById("verify-status-banner");
+        const icon = document.getElementById("verify-status-icon");
+        const title = document.getElementById("verify-status-title");
+        const desc = document.getElementById("verify-status-desc");
+        const problemsList = document.getElementById("verify-problems-list");
+
+        banner.classList.remove("hidden");
+        problemsList.classList.add("hidden");
+        problemsList.innerHTML = "";
+
+        try {
+          const res = await window.InvoiceTrustAPI.verifyIntegrity();
+          const allOk = res.chain_ok && res.files_ok;
+
+          if (allOk) {
+            banner.className = "rounded-3xl p-6 border bg-emerald-500/10 border-emerald-500/30 text-emerald-200";
+            icon.className = "w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center";
+            icon.innerHTML = `<svg class="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`;
+            title.textContent = "All Records Intact — Integrity Verified";
+            desc.textContent = "Every block in the SHA-256 hash chain is cryptographically continuous, and all off-chain PDF files in Storage match their genesis fingerprints.";
+          } else {
+            banner.className = "rounded-3xl p-6 border bg-rose-500/10 border-rose-500/30 text-rose-200";
+            icon.className = "w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center";
+            icon.innerHTML = `<svg class="w-6 h-6 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>`;
+            title.textContent = "TAMPERED — Cryptographic Discrepancy Detected";
+            desc.textContent = "Forensic inspection detected off-chain file alteration or broken audit chain links. Disbursals should be frozen.";
+
+            if (res.problems && res.problems.length > 0) {
+              problemsList.classList.remove("hidden");
+              res.problems.forEach(p => {
+                const item = document.createElement("div");
+                item.className = "p-2 rounded bg-rose-950/40 border border-rose-500/30 text-rose-300";
+                item.textContent = `Invoice #${p.invoice_id || 'System'}: ${p.issue}`;
+                problemsList.appendChild(item);
+              });
+            }
+          }
+        } catch (err) {
+          window.showToast(`Verification error: ${err.message}`, "error");
+        }
+      }
+    </script>
+  </body>
+</html>
