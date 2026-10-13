@@ -1,0 +1,6 @@
+{
+  "name": "InvoiceTrust - Liquid Glass Invoice Financing Verification",
+  "description": "Premium iOS liquid-glass fintech platform for invoice-financing fraud detection, cross-document verification, and risk management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

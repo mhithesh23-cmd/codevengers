@@ -4,9 +4,7 @@ An invoice-financing verification platform for lenders to detect fraud, verify i
 
 ---
 
-## Team Setup Guide
-
-Follow these steps to set up your local development environment:
+## Backend Setup (Python FastAPI + Supabase)
 
 ### 1. Clone the repository
 ```bash
@@ -26,13 +24,13 @@ cd codevengers
   source venv/bin/activate
   ```
 
-### 3. Install dependencies
+### 3. Install backend dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 4. Configure environment variables
-Copy the `.env.example` file to create your local `.env`:
+Copy `.env.example` to create your local `.env`:
 - **Windows (PowerShell):**
   ```powershell
   Copy-Item .env.example .env
@@ -45,37 +43,41 @@ Copy the `.env.example` file to create your local `.env`:
 Open `.env` and fill in your Supabase credentials:
 ```env
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your-supabase-anon-or-service-key
+SUPABASE_KEY=your-supabase-key
 ```
 
----
-
-## Running the Server
-
-Start the FastAPI development server with live reload:
-
+### 5. Run the Backend Server
 ```bash
 uvicorn backend.main:app --reload
 ```
-
-Once running, the API will be available at: `http://127.0.0.1:8000`
+API is available at: `http://127.0.0.1:8000`
 
 ---
 
-## Testing Endpoints
+## Frontend Setup (Vite / Tailwind / JS)
+
+**Prerequisites:** Node.js
+
+1. Install frontend dependencies:
+   ```bash
+   npm install
+   ```
+2. Run the frontend dev server:
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## Testing Backend Endpoints
 
 1. **Health Check:**
-   - URL: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
-   - Expected Response:
-     ```json
-     {
-       "status": "ok"
-     }
-     ```
+   - URL: `http://127.0.0.1:8000/health`
+   - Response: `{"status": "ok"}`
 
 2. **Supabase Database Test:**
-   - URL: [http://127.0.0.1:8000/test-db](http://127.0.0.1:8000/test-db)
-   - Expected Response:
+   - URL: `http://127.0.0.1:8000/test-db`
+   - Response:
      ```json
      {
        "status": "connected",
@@ -86,4 +88,4 @@ Once running, the API will be available at: `http://127.0.0.1:8000`
      ```
 
 3. **Interactive Swagger Docs:**
-   - Visit [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+   - Visit `http://127.0.0.1:8000/docs`

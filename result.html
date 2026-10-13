@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verification Report — InvoiceTrust</title>
+    <meta name="description" content="Detailed invoice-financing risk assessment and multi-way document verification report." />
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/src/liquid-glass.css" />
+  </head>
+  <body class="bg-[#070B14] text-slate-100 min-h-screen relative selection:bg-emerald-500/30 selection:text-emerald-200">
+    <!-- Ambient ambient lights -->
+    <div class="ambient-bg" aria-hidden="true">
+      <div class="ambient-orb-1"></div>
+      <div class="ambient-orb-2"></div>
+      <div class="ambient-orb-3"></div>
+    </div>
+
+    <!-- Floating Navigation Bar -->
+    <header class="fixed top-4 left-0 right-0 z-40 px-4 sm:px-6 max-w-7xl mx-auto no-print">
+      <nav class="liquid-nav rounded-2xl px-5 py-3.5 flex items-center justify-between gap-6 shadow-2xl">
+        <a href="index.html" class="flex items-center gap-3 shrink-0 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)] border border-white/20">
+            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-base font-bold tracking-tight text-white flex items-center gap-1.5">
+              InvoiceTrust
+              <span class="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">Report</span>
+            </span>
+            <span class="text-[11px] text-slate-400 font-medium">Risk & Verification Dossier</span>
+          </div>
+        </a>
+
+        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+          <a href="index.html" class="hover:text-white transition-colors">New Verification</a>
+          <a href="dashboard.html" class="hover:text-white transition-colors">Lender Dashboard</a>
+          <a id="nav-audit-link" href="audit.html" class="hover:text-white transition-colors">Audit Trail</a>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <button type="button" onclick="window.print()" class="btn-liquid-secondary px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            <span class="hidden sm:inline">Print / Export PDF</span>
+          </button>
+          <a href="index.html" class="btn-liquid-primary px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+            <span>+ New Verify</span>
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 pt-28 pb-20 px-4 sm:px-6 max-w-7xl mx-auto space-y-8">
+      
+      <!-- Back Link & Header Title -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+        <div>
+          <div class="flex items-center gap-2 text-xs text-slate-400 mb-1">
+            <a href="dashboard.html" class="hover:text-emerald-400 transition-colors flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+              Lender Ledger
+            </a>
+            <span>/</span>
+            <span id="breadcrumb-id" class="text-slate-200 font-mono-numbers">INV-2024-8841</span>
+            <span>/</span>
+            <span class="text-emerald-400">Risk Assessment Dossier</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+            <span id="header-invoice-title">Verification Report</span>
+            <span id="data-source-badge" class="text-[11px] font-semibold uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+              Demo Seed
+            </span>
+          </h1>
+        </div>
+
+        <!-- Real-time Action Sync Status -->
+        <div id="backend-sync-alert" class="px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs text-slate-300 flex items-center gap-2 self-start sm:self-auto font-mono-numbers">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="backend-sync-text">Live Sync · Local Mode</span>
+        </div>
+      </div>
+
+      <!-- Top Row: Risk Score Gauge + Decision Badge + Executive Summary -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Risk Gauge & Decision Badge Card (5 Cols) -->
+        <div class="lg:col-span-5 glass-panel-elevated rounded-3xl p-6 sm:p-8 flex flex-col justify-between specular-highlight border border-white/10 space-y-6">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Risk Score Analysis</span>
+            <span id="risk-category-badge" class="text-xs font-bold px-2.5 py-0.5 rounded-full">--</span>
+          </div>
+
+          <!-- Circular Liquid SVG Gauge -->
+          <div class="relative flex flex-col items-center justify-center my-2">
+            <svg class="w-48 h-48 transform -rotate-90" viewBox="0 0 120 120">
+              <!-- Background track -->
+              <circle cx="60" cy="60" r="48" stroke="rgba(255, 255, 255, 0.08)" stroke-width="10" fill="transparent" />
+              <!-- Animated Progress Path -->
+              <circle id="gauge-circle" cx="60" cy="60" r="48" stroke="#10B981" stroke-width="10" stroke-linecap="round" fill="transparent" stroke-dasharray="301.59" stroke-dashoffset="301.59" class="gauge-meter-path" />
+            </svg>
+            
+            <!-- Gauge Center Values -->
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+              <span id="gauge-score-value" class="text-5xl font-extrabold text-white font-mono-numbers tracking-tight">0</span>
+              <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Out of 100</span>
+            </div>
+          </div>
+
+          <!-- Decision Badge Panel -->
+          <div id="decision-container" class="rounded-2xl p-4 border text-center transition-all">
+            <div class="flex items-center justify-center gap-2 mb-1">
+              <span id="decision-icon"></span>
+              <span id="decision-text" class="text-lg font-extrabold tracking-wider uppercase">Evaluating</span>
+            </div>
+            <p id="decision-description" class="text-xs leading-relaxed text-slate-300">
+              Analyzing consistency across invoices, purchase orders, and delivery slips.
+            </p>
+          </div>
+
+          <!-- Decision-support signal disclaimer -->
+          <p class="text-[11px] text-slate-500 leading-relaxed text-center">
+            *Risk scores represent algorithmic decision-support signals. They do not constitute absolute proof of fraud. Cross-verify with buyer procurement before disbursement.
+          </p>
+        </div>
+
+        <!-- Invoice Summary & Financial Parameters Card (7 Cols) -->
+        <div class="lg:col-span-7 glass-panel-elevated rounded-3xl p-6 sm:p-8 flex flex-col justify-between specular-highlight border border-white/10 space-y-6">
+          <div class="border-b border-white/10 pb-4 flex items-center justify-between">
+            <div>
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Transaction Summary</span>
+              <h2 id="sum-seller-name" class="text-xl font-bold text-white mt-0.5">Apex Logistics Pvt Ltd</h2>
+              <p id="sum-buyer-name" class="text-xs text-slate-300">Billing to: Zenith Retail Corp</p>
+            </div>
+            <div class="text-right">
+              <span class="text-[11px] text-slate-400">Current Status</span>
+              <div id="sum-status-badge" class="mt-0.5 text-xs font-bold px-3 py-1 rounded-full inline-block">--</div>
+            </div>
+          </div>
+
+          <!-- Metric Cards Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+            <div class="glass-panel-subtle rounded-2xl p-3.5 border border-white/5">
+              <span class="text-[11px] text-slate-400 block">Invoice Total</span>
+              <span id="sum-inv-amount" class="text-lg font-bold text-white font-mono-numbers block mt-1">₹0</span>
+              <span class="text-[10px] text-slate-400">Gross billing</span>
+            </div>
+
+            <div class="glass-panel-subtle rounded-2xl p-3.5 border border-white/5">
+              <span class="text-[11px] text-slate-400 block">Requested Financing</span>
+              <span id="sum-req-amount" class="text-lg font-bold text-emerald-400 font-mono-numbers block mt-1">₹0</span>
+              <span class="text-[10px] text-slate-400">80% LTV standard</span>
+            </div>
+
+            <div class="glass-panel-subtle rounded-2xl p-3.5 border border-white/5">
+              <span class="text-[11px] text-slate-400 block">Invoice Number</span>
+              <span id="sum-inv-number" class="text-sm font-bold text-white font-mono-numbers block mt-1.5 truncate">--</span>
+              <span class="text-[10px] text-slate-400">Identifier</span>
+            </div>
+
+            <div class="glass-panel-subtle rounded-2xl p-3.5 border border-white/5">
+              <span class="text-[11px] text-slate-400 block">Invoice Due Date</span>
+              <span id="sum-due-date" class="text-sm font-semibold text-white block mt-1.5 font-mono-numbers">--</span>
+              <span class="text-[10px] text-slate-400">Payment tenor</span>
+            </div>
+
+            <div class="glass-panel-subtle rounded-2xl p-3.5 border border-white/5">
+              <span class="text-[11px] text-slate-400 block">Verification Timestamp</span>
+              <span id="sum-timestamp" class="text-xs font-semibold text-white block mt-1.5 font-mono-numbers truncate">--</span>
+              <span class="text-[10px] text-slate-400">Immutable record</span>
+            </div>
+
+            <div class="glass-panel-subtle rounded-2xl p-3.5 border border-white/5">
+              <span class="text-[11px] text-slate-400 block">Supporting Documents</span>
+              <span class="text-xs font-semibold text-white block mt-1.5 flex items-center gap-1 text-emerald-400">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                4 of 4 Verified
+              </span>
+              <span class="text-[10px] text-slate-400">All PDFs present</span>
+            </div>
+          </div>
+
+          <!-- Lender Fast Actions Toolbar -->
+          <div class="pt-4 border-t border-white/10 no-print flex flex-wrap items-center justify-between gap-3">
+            <span class="text-xs font-semibold text-slate-400">Lender Actions:</span>
+            
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" id="btn-action-approve" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 transition-all flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Approve Financing
+              </button>
+              
+              <button type="button" id="btn-action-review" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 transition-all flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                Request Review
+              </button>
+
+              <button type="button" id="btn-action-reject" class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 transition-all flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                Reject Application
+              </button>
+
+              <a id="btn-view-audit" href="audit.html" class="px-3.5 py-2 rounded-xl text-xs font-medium bg-white/10 hover:bg-white/15 text-white border border-white/10 transition-colors flex items-center gap-1">
+                Audit Trail →
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Dedicated Fraud-Risk Warnings Section -->
+      <section id="fraud-warnings-section" class="glass-panel-elevated rounded-3xl p-6 sm:p-8 border border-white/10 space-y-4">
+        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white tracking-tight">Fraud-Risk Indicators & Anomalies</h2>
+              <p class="text-xs text-slate-400">Detected discrepancies requiring loan committee investigation.</p>
+            </div>
+          </div>
+          <span id="warning-count-badge" class="text-xs font-bold px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
+            0 Warnings
+          </span>
+        </div>
+
+        <div id="fraud-warnings-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Dynamically populated -->
+        </div>
+
+        <p class="text-[11px] text-slate-500 pt-2 border-t border-white/5">
+          *Notice: Warning flags identify anomalies requiring investigation and do not independently constitute legal proof of fraudulent intent.
+        </p>
+      </section>
+
+      <!-- Extracted Document Information & Cross-Matching Matrix -->
+      <section class="glass-panel-elevated rounded-3xl p-6 sm:p-8 border border-white/10 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Extracted Document Information (3-Way Matching Matrix)</h2>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Comparison across Invoice, Purchase Order, Delivery Receipt, and Master Contract.
+            </p>
+          </div>
+          
+          <div class="flex items-center gap-3 text-xs">
+            <span class="flex items-center gap-1.5 text-emerald-400">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Verified Match
+            </span>
+            <span class="flex items-center gap-1.5 text-rose-400">
+              <span class="w-2 h-2 rounded-full bg-rose-400"></span> Mismatch Detected
+            </span>
+          </div>
+        </div>
+
+        <!-- Matrix Table -->
+        <div class="overflow-x-auto rounded-2xl border border-white/10">
+          <table class="w-full text-left text-xs table-glass">
+            <thead>
+              <tr class="bg-slate-900/80 text-slate-400 border-b border-white/10">
+                <th class="py-3 px-4 font-semibold">Data Field</th>
+                <th class="py-3 px-4 font-semibold">Invoice PDF</th>
+                <th class="py-3 px-4 font-semibold">Purchase Order (PO)</th>
+                <th class="py-3 px-4 font-semibold">Delivery Receipt (POD)</th>
+                <th class="py-3 px-4 font-semibold">Master Contract (MSA)</th>
+                <th class="py-3 px-4 font-semibold text-center">Cross-Check</th>
+              </tr>
+            </thead>
+            <tbody id="extracted-fields-tbody" class="divide-y divide-white/5 text-slate-300">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Complete 14-Point Verification Checklist Section -->
+      <section class="glass-panel-elevated rounded-3xl p-6 sm:p-8 border border-white/10 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Comprehensive 14-Point Verification Checklist</h2>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Algorithmic verification across identity, arithmetic, duplicate registries, and contract fidelity.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="filter-check-all" class="px-2.5 py-1 rounded-lg bg-white/10 text-white text-xs font-medium">All (14)</button>
+            <button id="filter-check-failed" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-rose-300 text-xs font-medium">Anomalies</button>
+            <button id="filter-check-passed" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-emerald-300 text-xs font-medium">Passed</button>
+          </div>
+        </div>
+
+        <!-- Checklist List -->
+        <div id="checklist-container" class="space-y-3">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Confirmation Modal for Lender Decision -->
+    <div id="confirmation-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+      <div class="glass-panel-elevated rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-white/20 shadow-2xl space-y-6">
+        <div class="flex items-center gap-3">
+          <div id="modal-confirm-icon" class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shrink-0"></div>
+          <div>
+            <h3 id="modal-confirm-title" class="text-lg font-bold text-white">Confirm Financing Action</h3>
+            <p id="modal-confirm-subtitle" class="text-xs text-slate-400">This action will be committed to the immutable audit trail.</p>
+          </div>
+        </div>
+
+        <div class="space-y-3 text-xs bg-slate-900/60 p-4 rounded-2xl border border-white/10">
+          <div class="flex justify-between text-slate-400">
+            <span>Invoice Identifier:</span>
+            <span id="modal-confirm-invid" class="text-white font-mono-numbers font-semibold">--</span>
+          </div>
+          <div class="flex justify-between text-slate-400">
+            <span>Requested Amount:</span>
+            <span id="modal-confirm-amount" class="text-emerald-400 font-mono-numbers font-semibold">--</span>
+          </div>
+          <div>
+            <label for="modal-confirm-notes" class="block text-slate-300 font-medium mb-1">Credit Officer Remarks / Rationale:</label>
+            <textarea id="modal-confirm-notes" rows="3" placeholder="Enter review remarks or justification..." class="w-full px-3 py-2 rounded-xl bg-slate-800/80 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-xs"></textarea>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button type="button" id="modal-btn-cancel" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors">
+            Cancel
+          </button>
+          <button type="button" id="modal-btn-execute" class="px-6 py-2.5 rounded-xl text-xs font-bold btn-liquid-primary shadow-lg">
+            Confirm & Commit
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/src/invoicetrust.js"></script>
+    <script>
+      let currentInvoice = null;
+      let pendingAction = null;
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        // Read invoice ID from URL parameter or default to first seed case
+        const urlParams = new URLSearchParams(window.location.search);
+        const invId = urlParams.get("id") || "INV-2024-8841";
+
+        // Check backend health
+        const health = await window.checkBackendHealth();
+        const syncText = document.getElementById("backend-sync-text");
+        if (health.connected) {
+          syncText.textContent = "Live Backend Online";
+        } else {
+          syncText.textContent = "Local Mode (Mock Engine)";
+        }
+
+        // Fetch invoice
+        currentInvoice = await window.InvoiceTrustDB.getById(invId);
+        if (!currentInvoice) {
+          const all = await window.InvoiceTrustDB.getAll();
+          currentInvoice = all[0];
+        }
+
+        renderInvoiceReport(currentInvoice);
+
+        // Bind Action buttons
+        document.getElementById("btn-action-approve").addEventListener("click", () => openActionModal("APPROVE"));
+        document.getElementById("btn-action-review").addEventListener("click", () => openActionModal("REVIEW"));
+        document.getElementById("btn-action-reject").addEventListener("click", () => openActionModal("REJECT"));
+
+        document.getElementById("modal-btn-cancel").addEventListener("click", closeActionModal);
+        document.getElementById("modal-btn-execute").addEventListener("click", executeActionCommit);
+
+        // Filter checklist buttons
+        document.getElementById("filter-check-all").addEventListener("click", () => filterChecklist("all"));
+        document.getElementById("filter-check-failed").addEventListener("click", () => filterChecklist("anomalies"));
+        document.getElementById("filter-check-passed").addEventListener("click", () => filterChecklist("passed"));
+      });
+
+      function renderInvoiceReport(inv) {
+        if (!inv) return;
+
+        // Links
+        document.getElementById("breadcrumb-id").textContent = inv.invoiceNumber;
+        document.getElementById("header-invoice-title").textContent = `Invoice ${inv.invoiceNumber} — Verification Report`;
+        document.getElementById("btn-view-audit").href = `audit.html?id=${encodeURIComponent(inv.id)}`;
+        document.getElementById("nav-audit-link").href = `audit.html?id=${encodeURIComponent(inv.id)}`;
+
+        // Summary
+        document.getElementById("sum-seller-name").textContent = inv.sellerName;
+        document.getElementById("sum-buyer-name").textContent = `Debtor: ${inv.buyerName} · GSTIN: ${inv.buyerGstin || "Verified"}`;
+        document.getElementById("sum-inv-amount").textContent = window.formatINR(inv.invoiceAmount);
+        document.getElementById("sum-req-amount").textContent = window.formatINR(inv.requestedAmount);
+        document.getElementById("sum-inv-number").textContent = inv.invoiceNumber;
+        document.getElementById("sum-due-date").textContent = inv.dueDate || "Net 60";
+        document.getElementById("sum-timestamp").textContent = new Date(inv.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
+
+        // Status badge
+        const statusBadge = document.getElementById("sum-status-badge");
+        if (inv.status === "Approved") {
+          statusBadge.className = "mt-0.5 text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+          statusBadge.textContent = "Approved";
+        } else if (inv.status === "Rejected") {
+          statusBadge.className = "mt-0.5 text-xs font-bold px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30";
+          statusBadge.textContent = "Rejected";
+        } else {
+          statusBadge.className = "mt-0.5 text-xs font-bold px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30";
+          statusBadge.textContent = "Under Review";
+        }
+
+        // Render Animated Gauge & Decision Badge
+        renderRiskGauge(inv.riskScore, inv.decision);
+
+        // Render Fraud Warnings
+        renderFraudWarnings(inv.fraudWarnings || []);
+
+        // Render Extracted Fields 3-Way Matrix
+        renderExtractedMatrix(inv.extractedFields || []);
+
+        // Render 14-Point Checklist
+        renderChecklist(inv.checklist || []);
+      }
+
+      function renderRiskGauge(score, decision) {
+        const scoreEl = document.getElementById("gauge-score-value");
+        const circle = document.getElementById("gauge-circle");
+        const categoryBadge = document.getElementById("risk-category-badge");
+        const decisionContainer = document.getElementById("decision-container");
+        const decisionText = document.getElementById("decision-text");
+        const decisionIcon = document.getElementById("decision-icon");
+        const decisionDesc = document.getElementById("decision-description");
+
+        // Circumference for r=48 is 2 * PI * 48 = 301.59
+        const circumference = 301.59;
+        const offset = circumference - (score / 100) * circumference;
+
+        circle.style.strokeDashoffset = offset;
+
+        // Animate counter
+        let start = 0;
+        const duration = 1200;
+        const stepTime = 20;
+        const steps = duration / stepTime;
+        const increment = score / steps;
+        const timer = setInterval(() => {
+          start += increment;
+          if (start >= score) {
+            scoreEl.textContent = score;
+            clearInterval(timer);
+          } else {
+            scoreEl.textContent = Math.round(start);
+          }
+        }, stepTime);
+
+        // Color thresholds: 0-29 Low (Green), 30-59 Medium (Amber), 60-100 High (Red)
+        if (score >= 60) {
+          circle.style.stroke = "#F43F5E"; // Rose / Red
+          categoryBadge.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40";
+          categoryBadge.textContent = "HIGH RISK (60-100)";
+        } else if (score >= 30) {
+          circle.style.stroke = "#F59E0B"; // Amber
+          categoryBadge.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40";
+          categoryBadge.textContent = "MEDIUM RISK (30-59)";
+        } else {
+          circle.style.stroke = "#10B981"; // Emerald
+          categoryBadge.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+          categoryBadge.textContent = "LOW RISK (0-29)";
+        }
+
+        // Decision Badge visual state
+        if (decision === "APPROVE") {
+          decisionContainer.className = "rounded-2xl p-4 border bg-emerald-500/10 border-emerald-500/30 text-emerald-300";
+          decisionText.textContent = "RECOMMENDED DECISION: APPROVE";
+          decisionIcon.innerHTML = `<svg class="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+          decisionDesc.textContent = "All 14 verification criteria satisfied. 3-way matching verified, registered active entities, zero duplicate exposure.";
+        } else if (decision === "REJECT") {
+          decisionContainer.className = "rounded-2xl p-4 border bg-rose-500/10 border-rose-500/30 text-rose-300";
+          decisionText.textContent = "RECOMMENDED DECISION: REJECT / ESCALATE";
+          decisionIcon.innerHTML = `<svg class="w-6 h-6 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
+          decisionDesc.textContent = "Severe risk anomalies detected. Inconsistent banking details, rate padding, or chronological inversion present.";
+        } else {
+          decisionContainer.className = "rounded-2xl p-4 border bg-amber-500/10 border-amber-500/30 text-amber-300";
+          decisionText.textContent = "RECOMMENDED DECISION: MANUAL REVIEW REQUIRED";
+          decisionIcon.innerHTML = `<svg class="w-6 h-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>`;
+          decisionDesc.textContent = "Moderate risk indicators observed. Requires manual buyer telephone callback and delivery seal confirmation.";
+        }
+      }
+
+      function renderFraudWarnings(warnings) {
+        const list = document.getElementById("fraud-warnings-list");
+        const countBadge = document.getElementById("warning-count-badge");
+        list.innerHTML = "";
+
+        countBadge.textContent = `${warnings.length} Detected ${warnings.length === 1 ? 'Indicator' : 'Indicators'}`;
+
+        if (warnings.length === 0) {
+          list.innerHTML = `
+            <div class="col-span-full py-8 text-center glass-panel-subtle rounded-2xl border border-emerald-500/20 text-emerald-300">
+              <svg class="w-8 h-8 mx-auto mb-2 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <div class="text-sm font-semibold">Zero Fraud Anomalies Detected</div>
+              <div class="text-xs text-slate-400 mt-0.5">All banking details, PO terms, and delivery chronological stamps match flawlessly.</div>
+            </div>
+          `;
+          countBadge.className = "text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+          return;
+        }
+
+        warnings.forEach(w => {
+          const card = document.createElement("div");
+          const isCritical = w.severity === "critical";
+          card.className = `p-4 rounded-2xl border ${isCritical ? 'bg-rose-500/10 border-rose-500/30' : 'bg-amber-500/10 border-amber-500/30'} space-y-2`;
+          card.innerHTML = `
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider ${isCritical ? 'text-rose-400' : 'text-amber-400'} flex items-center gap-1.5">
+                <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                ${w.title}
+              </span>
+              <span class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded ${isCritical ? 'bg-rose-500/20 text-rose-300' : 'bg-amber-500/20 text-amber-300'}">${w.severity}</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">${w.description}</p>
+            <div class="text-[11px] font-medium text-slate-400 pt-1 border-t border-white/5 flex items-center gap-1">
+              <span class="text-slate-500">Fintech Impact:</span> ${w.impact}
+            </div>
+          `;
+          list.appendChild(card);
+        });
+      }
+
+      function renderExtractedMatrix(fields) {
+        const tbody = document.getElementById("extracted-fields-tbody");
+        tbody.innerHTML = "";
+
+        fields.forEach(f => {
+          const tr = document.createElement("tr");
+          const isMatch = f.status === "match";
+          tr.className = "hover:bg-white/[0.02] transition-colors";
+          tr.innerHTML = `
+            <td class="py-3 px-4 font-semibold text-white">
+              <div>${f.field}</div>
+              <div class="text-[10px] text-slate-400 font-normal">Source: ${f.source || 'Invoice'}</div>
+            </td>
+            <td class="py-3 px-4 font-mono-numbers ${!isMatch ? 'text-rose-300 font-medium' : 'text-slate-300'}">${f.invoice || '—'}</td>
+            <td class="py-3 px-4 font-mono-numbers ${!isMatch ? 'text-rose-300 font-medium' : 'text-slate-300'}">${f.po || '—'}</td>
+            <td class="py-3 px-4 font-mono-numbers text-slate-400">${f.pod || '—'}</td>
+            <td class="py-3 px-4 font-mono-numbers text-slate-400">${f.contract || '—'}</td>
+            <td class="py-3 px-4 text-center">
+              ${isMatch ? `
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  Match
+                </span>
+              ` : `
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30" title="${f.note || 'Mismatch detected'}">
+                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  Mismatch
+                </span>
+              `}
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function renderChecklist(checklist) {
+        const container = document.getElementById("checklist-container");
+        container.innerHTML = "";
+
+        checklist.forEach(item => {
+          const row = document.createElement("div");
+          const isPassed = item.status === "passed";
+          const isWarning = item.status === "warning";
+          const isFailed = item.status === "failed";
+
+          let badgeHtml = "";
+          let borderClass = "";
+
+          if (isPassed) {
+            borderClass = "border-emerald-500/20 bg-emerald-500/[0.02]";
+            badgeHtml = `<span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              PASSED
+            </span>`;
+          } else if (isWarning) {
+            borderClass = "border-amber-500/30 bg-amber-500/[0.04]";
+            badgeHtml = `<span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01"/></svg>
+              WARNING
+            </span>`;
+          } else {
+            borderClass = "border-rose-500/30 bg-rose-500/[0.05]";
+            badgeHtml = `<span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30 flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              FAILED
+            </span>`;
+          }
+
+          row.className = `p-4 rounded-2xl border ${borderClass} transition-all space-y-2 checklist-item data-status-${item.status}`;
+          row.innerHTML = `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center gap-2.5">
+                <span class="text-xs font-mono text-slate-500 font-semibold w-5">${item.id}.</span>
+                <span class="text-sm font-semibold text-white">${item.name}</span>
+              </div>
+              <div class="shrink-0">${badgeHtml}</div>
+            </div>
+            
+            <p class="text-xs text-slate-300 pl-7 leading-relaxed">${item.reason}</p>
+            
+            <div class="pl-7 pt-1 text-[11px] text-slate-400 flex flex-wrap items-center gap-x-6 gap-y-1">
+              <div><span class="text-slate-500 font-medium">Evidence:</span> <span class="text-slate-300 font-mono-numbers">${item.evidence}</span></div>
+              <div><span class="text-slate-500 font-medium">Next Action:</span> <span class="text-emerald-300 font-medium">${item.action}</span></div>
+            </div>
+          `;
+          container.appendChild(row);
+        });
+      }
+
+      function filterChecklist(type) {
+        const items = document.querySelectorAll(".checklist-item");
+        items.forEach(el => {
+          if (type === "all") {
+            el.classList.remove("hidden");
+          } else if (type === "anomalies") {
+            if (el.classList.contains("data-status-failed") || el.classList.contains("data-status-warning")) {
+              el.classList.remove("hidden");
+            } else {
+              el.classList.add("hidden");
+            }
+          } else if (type === "passed") {
+            if (el.classList.contains("data-status-passed")) {
+              el.classList.remove("hidden");
+            } else {
+              el.classList.add("hidden");
+            }
+          }
+        });
+      }
+
+      function openActionModal(action) {
+        pendingAction = action;
+        const modal = document.getElementById("confirmation-modal");
+        const title = document.getElementById("modal-confirm-title");
+        const icon = document.getElementById("modal-confirm-icon");
+        const executeBtn = document.getElementById("modal-btn-execute");
+
+        document.getElementById("modal-confirm-invid").textContent = currentInvoice.invoiceNumber;
+        document.getElementById("modal-confirm-amount").textContent = window.formatINR(currentInvoice.requestedAmount);
+        document.getElementById("modal-confirm-notes").value = "";
+
+        if (action === "APPROVE") {
+          title.textContent = "Confirm Financing Approval";
+          icon.className = "w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/40";
+          icon.innerHTML = `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`;
+          executeBtn.className = "px-6 py-2.5 rounded-xl text-xs font-bold btn-liquid-primary shadow-lg shadow-emerald-500/30";
+          executeBtn.textContent = "Authorize Financing";
+        } else if (action === "REJECT") {
+          title.textContent = "Confirm Application Rejection";
+          icon.className = "w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center border border-rose-500/40";
+          icon.innerHTML = `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>`;
+          executeBtn.className = "px-6 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/30";
+          executeBtn.textContent = "Reject & Flag Application";
+        } else {
+          title.textContent = "Request Senior Manual Review";
+          icon.className = "w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/40";
+          icon.innerHTML = `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01"/></svg>`;
+          executeBtn.className = "px-6 py-2.5 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white shadow-lg shadow-amber-600/30";
+          executeBtn.textContent = "Escalate to Review Queue";
+        }
+
+        modal.classList.remove("hidden");
+      }
+
+      function closeActionModal() {
+        document.getElementById("confirmation-modal").classList.add("hidden");
+        pendingAction = null;
+      }
+
+      async function executeActionCommit() {
+        if (!pendingAction || !currentInvoice) return;
+
+        const notes = document.getElementById("modal-confirm-notes").value.trim();
+        const updated = await window.InvoiceTrustDB.recordDecision(currentInvoice.id, pendingAction, notes);
+
+        if (updated) {
+          currentInvoice = updated;
+          renderInvoiceReport(currentInvoice);
+          closeActionModal();
+          window.showToast(`Application successfully updated: ${pendingAction}`, "success");
+        }
+      }
+    </script>
+  </body>
+</html>

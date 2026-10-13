@@ -1,5 +1,7 @@
 # Environment variables
 .env
+.env*
+!.env.example
 
 # Virtual Environment
 venv/
@@ -15,6 +17,14 @@ __pycache__/
 
 # Uploaded files
 uploads/
+
+# Node / Frontend
+node_modules/
+build/
+dist/
+coverage/
+*.log
+.aistudio/
 
 # IDE & OS files
 .vscode/

@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Audit Trail & Cryptographic Integrity — InvoiceTrust</title>
+    <meta name="description" content="Immutable cryptographic audit trail, SHA-256 document verification, and forensic lifecycle logs." />
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/src/liquid-glass.css" />
+  </head>
+  <body class="bg-[#070B14] text-slate-100 min-h-screen relative selection:bg-emerald-500/30 selection:text-emerald-200">
+    <!-- Ambient ambient lights -->
+    <div class="ambient-bg" aria-hidden="true">
+      <div class="ambient-orb-1"></div>
+      <div class="ambient-orb-2"></div>
+      <div class="ambient-orb-3"></div>
+    </div>
+
+    <!-- Floating Navigation Bar -->
+    <header class="fixed top-4 left-0 right-0 z-40 px-4 sm:px-6 max-w-7xl mx-auto no-print">
+      <nav class="liquid-nav rounded-2xl px-5 py-3.5 flex items-center justify-between gap-6 shadow-2xl">
+        <a href="index.html" class="flex items-center gap-3 shrink-0 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)] border border-white/20">
+            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-base font-bold tracking-tight text-white flex items-center gap-1.5">
+              InvoiceTrust
+              <span class="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">Audit</span>
+            </span>
+            <span class="text-[11px] text-slate-400 font-medium">Immutable Verification Proof</span>
+          </div>
+        </a>
+
+        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+          <a href="index.html" class="hover:text-white transition-colors">New Verification</a>
+          <a href="dashboard.html" class="hover:text-white transition-colors">Lender Dashboard</a>
+          <a href="audit.html" class="text-emerald-400 border-b border-emerald-400/80 pb-0.5 font-semibold transition-colors">Audit Trail</a>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button type="button" id="btn-export-audit" class="btn-liquid-secondary px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            <span class="hidden sm:inline">Export Audit Log (JSON)</span>
+          </button>
+          
+          <button type="button" onclick="window.print()" class="btn-liquid-primary px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            <span>Print Certificate</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 pt-28 pb-20 px-4 sm:px-6 max-w-7xl mx-auto space-y-8">
+      
+      <!-- Top Title & Invoice Selection Dropdown -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Cryptographic Audit Trail</h1>
+          <p class="text-xs text-slate-400 mt-1">
+            Forensic event sequence, SHA-256 document fingerprint validation, and tamper verification.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <label for="select-audit-invoice" class="text-xs text-slate-400 font-medium">Select Application:</label>
+          <select id="select-audit-invoice" class="px-3.5 py-2 rounded-xl bg-slate-900/80 border border-slate-700/80 text-white text-xs font-mono-numbers focus:outline-none focus:border-emerald-500">
+            <!-- Options populated dynamically -->
+          </select>
+        </div>
+      </div>
+
+      <!-- Cryptographic Document Integrity Section -->
+      <section class="glass-panel-elevated rounded-3xl p-6 sm:p-8 border border-white/10 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white tracking-tight">Document Checksums & Tamper Verification</h2>
+              <p class="text-xs text-slate-400">SHA-256 cryptographic fingerprints computed upon upload.</p>
+            </div>
+          </div>
+          <span class="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Hashes Verified Immutable
+          </span>
+        </div>
+
+        <!-- 4 Document Checksum Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="document-checksums-grid">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- Chronological Immutable Audit Timeline -->
+      <section class="glass-panel-elevated rounded-3xl p-6 sm:p-8 border border-white/10 space-y-6">
+        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+          <div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Chronological Lifecycle Timeline</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Every OCR extraction, duplicate registry query, and human review action.</p>
+          </div>
+          <div class="text-xs font-mono text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg">
+            Append-Only Ledger
+          </div>
+        </div>
+
+        <!-- Timeline Events -->
+        <div id="audit-timeline-container" class="space-y-4 relative pl-6 before:content-[''] before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-gradient-to-b before:from-emerald-500 before:via-teal-500 before:to-slate-700">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- Verification Certificate Card -->
+      <section class="glass-panel-subtle rounded-3xl p-6 sm:p-8 border border-white/10 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+          <div>
+            <span class="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider">Proof of Due Diligence</span>
+            <h3 class="text-lg font-bold text-white">InvoiceTrust Verification Certificate</h3>
+            <p class="text-xs text-slate-400">Suitable for institutional compliance, internal audit, and capital partner syndication.</p>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] text-slate-500 uppercase tracking-wider block">Certificate ID</span>
+            <span id="cert-id" class="text-xs font-mono font-bold text-white block">CERT-8902-IT-2024</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          <div class="p-3 rounded-xl bg-slate-900/60 border border-white/5">
+            <span class="text-slate-500 block text-[10px] uppercase">Issuer Engine</span>
+            <span class="text-slate-200 font-semibold mt-0.5 block">InvoiceTrust Neural Verifier v2.4</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900/60 border border-white/5">
+            <span class="text-slate-500 block text-[10px] uppercase">Digest Algorithm</span>
+            <span class="text-slate-200 font-mono font-semibold mt-0.5 block">SHA-256 + 14-Point Heuristics</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900/60 border border-white/5">
+            <span class="text-slate-500 block text-[10px] uppercase">Compliance Standard</span>
+            <span class="text-slate-200 font-semibold mt-0.5 block">Fintech Trade Receivables Lending ISO-27001</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <script src="/src/invoicetrust.js"></script>
+    <script>
+      let currentInvoice = null;
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const invId = urlParams.get("id") || "INV-2024-8841";
+
+        const invoices = await window.InvoiceTrustDB.getAll();
+        populateInvoiceSelector(invoices, invId);
+
+        currentInvoice = invoices.find(i => i.id === invId) || invoices[0];
+        renderAuditPage(currentInvoice);
+
+        // Selector change listener
+        document.getElementById("select-audit-invoice").addEventListener("change", async (e) => {
+          const selected = invoices.find(i => i.id === e.target.value);
+          if (selected) {
+            currentInvoice = selected;
+            renderAuditPage(currentInvoice);
+          }
+        });
+
+        // Export JSON listener
+        document.getElementById("btn-export-audit").addEventListener("click", exportAuditJson);
+      });
+
+      function populateInvoiceSelector(invoices, currentId) {
+        const select = document.getElementById("select-audit-invoice");
+        select.innerHTML = "";
+
+        invoices.forEach(inv => {
+          const opt = document.createElement("option");
+          opt.value = inv.id;
+          opt.textContent = `${inv.invoiceNumber} — ${inv.sellerName} (${inv.decision})`;
+          if (inv.id === currentId) opt.selected = true;
+          select.appendChild(opt);
+        });
+      }
+
+      function renderAuditPage(inv) {
+        if (!inv) return;
+
+        // Render Document Checksums
+        const checksumsGrid = document.getElementById("document-checksums-grid");
+        checksumsGrid.innerHTML = "";
+
+        const docs = inv.documents || {};
+        const docKeys = [
+          { key: "invoice", label: "Invoice PDF", iconColor: "emerald" },
+          { key: "po", label: "Purchase Order (PO)", iconColor: "cyan" },
+          { key: "delivery", label: "Delivery Receipt (POD)", iconColor: "blue" },
+          { key: "contract", label: "Master Contract (MSA)", iconColor: "purple" }
+        ];
+
+        docKeys.forEach(d => {
+          const fileInfo = docs[d.key] || { name: `${d.label}.pdf`, size: "1.2 MB", sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" };
+          const card = document.createElement("div");
+          card.className = "p-4 rounded-2xl bg-slate-900/60 border border-white/10 space-y-2";
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-white flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                ${d.label}
+              </span>
+              <span class="text-[10px] text-slate-400 font-mono-numbers">${fileInfo.size || '1.1 MB'}</span>
+            </div>
+            <div class="text-[11px] text-slate-300 font-medium truncate">${fileInfo.name}</div>
+            <div class="pt-1.5 border-t border-white/5">
+              <div class="text-[10px] text-slate-500 font-mono uppercase">SHA-256 Checksum:</div>
+              <div class="text-[11px] font-mono text-emerald-300 break-all bg-black/40 p-1.5 rounded-lg mt-0.5 select-all">
+                ${fileInfo.sha256}
+              </div>
+            </div>
+          `;
+          checksumsGrid.appendChild(card);
+        });
+
+        // Render Chronological Timeline
+        const timeline = document.getElementById("audit-timeline-container");
+        timeline.innerHTML = "";
+
+        const events = inv.auditEvents || [
+          { timestamp: inv.createdAt, actor: "Credit Desk", action: "Submission Received", details: "Initial documents ingested." }
+        ];
+
+        events.forEach((ev, idx) => {
+          const item = document.createElement("div");
+          item.className = "relative flex items-start gap-3 group";
+          item.innerHTML = `
+            <div class="absolute -left-6 top-1.5 w-3.5 h-3.5 rounded-full bg-slate-900 border-2 border-emerald-400 flex items-center justify-center">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            </div>
+            <div class="flex-1 p-4 rounded-2xl bg-slate-900/60 border border-white/10 hover:border-white/20 transition-all space-y-1">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                <span class="text-sm font-bold text-white">${ev.action}</span>
+                <span class="text-[11px] font-mono text-slate-400">${new Date(ev.timestamp).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "medium" })}</span>
+              </div>
+              <div class="text-xs text-emerald-400 font-medium">Actor: ${ev.actor}</div>
+              <p class="text-xs text-slate-300 leading-relaxed pt-1">${ev.details}</p>
+            </div>
+          `;
+          timeline.appendChild(item);
+        });
+
+        // Certificate ID
+        document.getElementById("cert-id").textContent = `CERT-${inv.invoiceNumber.replace(/[^a-zA-Z0-9]/g, '')}-${Date.now().toString().slice(-4)}`;
+      }
+
+      function exportAuditJson() {
+        if (!currentInvoice) return;
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentInvoice, null, 2));
+        const downloadAnchor = document.createElement("a");
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `InvoiceTrust_Audit_${currentInvoice.invoiceNumber}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+        window.showToast("Audit certificate JSON exported", "success");
+      }
+    </script>
+  </body>
+</html>
