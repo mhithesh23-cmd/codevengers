@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lender Portfolio Dashboard — InvoiceTrust</title>
+    <meta name="description" content="Manage invoice financing applications, monitor fraud risk distributions, and review supporting documentation." />
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <link rel="stylesheet" href="/src/liquid-glass.css" />
+  </head>
+  <body class="bg-[#070B14] text-slate-100 min-h-screen relative selection:bg-emerald-500/30 selection:text-emerald-200">
+    <!-- Ambient ambient lights -->
+    <div class="ambient-bg" aria-hidden="true">
+      <div class="ambient-orb-1"></div>
+      <div class="ambient-orb-2"></div>
+      <div class="ambient-orb-3"></div>
+    </div>
+
+    <!-- Floating Navigation Bar -->
+    <header class="fixed top-4 left-0 right-0 z-40 px-4 sm:px-6 max-w-7xl mx-auto no-print">
+      <nav class="liquid-nav rounded-2xl px-5 py-3.5 flex items-center justify-between gap-6 shadow-2xl">
+        <a href="index.html" class="flex items-center gap-3 shrink-0 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)] border border-white/20">
+            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-base font-bold tracking-tight text-white flex items-center gap-1.5">
+              InvoiceTrust
+              <span class="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">Lender Desk</span>
+            </span>
+            <span class="text-[11px] text-slate-400 font-medium">Financing Risk Management</span>
+          </div>
+        </a>
+
+        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+          <a href="index.html" class="hover:text-white transition-colors">New Verification</a>
+          <a href="dashboard.html" class="text-emerald-400 border-b border-emerald-400/80 pb-0.5 font-semibold transition-colors">Lender Dashboard</a>
+          <a href="audit.html" class="hover:text-white transition-colors">Audit Trail</a>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button type="button" id="btn-export-csv" class="btn-liquid-secondary px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span class="hidden sm:inline">Export CSV</span>
+          </button>
+          
+          <a href="index.html#upload-section" class="btn-liquid-primary px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Verify Invoice</span>
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 pt-28 pb-20 px-4 sm:px-6 max-w-7xl mx-auto space-y-8">
+      
+      <!-- Top Title Bar & Live Sync Status -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Lender Application Ledger</h1>
+          <p class="text-xs text-slate-400 mt-1">Real-time surveillance of supplier financing applications, double-pledging flags, and risk assessments.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700 text-xs text-slate-300 flex items-center gap-2 font-mono-numbers">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span id="ledger-sync-status">Live Ledger · In-Memory & Local Sync</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 KPI Summary Cards Grid -->
+      <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
+        
+        <div class="glass-panel-elevated rounded-2xl p-4 border border-white/10 specular-highlight">
+          <span class="text-[11px] font-semibold text-slate-400 block uppercase tracking-wider">Total Invoices</span>
+          <span id="kpi-total" class="text-2xl font-extrabold text-white font-mono-numbers block mt-1">0</span>
+          <span class="text-[10px] text-slate-500">All submissions</span>
+        </div>
+
+        <div class="glass-panel-elevated rounded-2xl p-4 border border-white/10 specular-highlight">
+          <span class="text-[11px] font-semibold text-amber-400 block uppercase tracking-wider">Under Review</span>
+          <span id="kpi-review" class="text-2xl font-extrabold text-amber-300 font-mono-numbers block mt-1">0</span>
+          <span class="text-[10px] text-slate-500">Requires desk signoff</span>
+        </div>
+
+        <div class="glass-panel-elevated rounded-2xl p-4 border border-white/10 specular-highlight">
+          <span class="text-[11px] font-semibold text-emerald-400 block uppercase tracking-wider">Approved</span>
+          <span id="kpi-approved" class="text-2xl font-extrabold text-emerald-400 font-mono-numbers block mt-1">0</span>
+          <span class="text-[10px] text-slate-500">Financing authorized</span>
+        </div>
+
+        <div class="glass-panel-elevated rounded-2xl p-4 border border-white/10 specular-highlight">
+          <span class="text-[11px] font-semibold text-rose-400 block uppercase tracking-wider">Rejected</span>
+          <span id="kpi-rejected" class="text-2xl font-extrabold text-rose-400 font-mono-numbers block mt-1">0</span>
+          <span class="text-[10px] text-slate-500">Adverse flags / decline</span>
+        </div>
+
+        <div class="glass-panel-elevated rounded-2xl p-4 border border-white/10 specular-highlight">
+          <span class="text-[11px] font-semibold text-rose-400 block uppercase tracking-wider">High Risk</span>
+          <span id="kpi-high-risk" class="text-2xl font-extrabold text-rose-400 font-mono-numbers block mt-1">0</span>
+          <span class="text-[10px] text-slate-500">Score ≥ 60 / 100</span>
+        </div>
+
+        <div class="glass-panel-elevated rounded-2xl p-4 border border-white/10 specular-highlight">
+          <span class="text-[11px] font-semibold text-cyan-400 block uppercase tracking-wider">Requested Vol.</span>
+          <span id="kpi-volume" class="text-lg font-extrabold text-cyan-300 font-mono-numbers block mt-1 truncate">₹0</span>
+          <span class="text-[10px] text-slate-500">Total pipeline exposure</span>
+        </div>
+
+      </section>
+
+      <!-- Visual Risk Heatmap Section (D3) -->
+      <section class="glass-panel-elevated rounded-3xl p-6 sm:p-8 border border-white/10 space-y-6 specular-highlight">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Visual Exposure Matrix</span>
+              <span class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-white/5 text-slate-400 border border-white/10">D3 Density Engine</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight mt-1">Portfolio Risk & Capital Concentration Heatmap</h2>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Interactive D3 heatmap mapping invoice density across Risk Score categories (0–100) and Financing Amount tiers. Click any quadrant to filter the ledger.
+            </p>
+          </div>
+
+          <!-- Heatmap Controls & Metric Toggle -->
+          <div class="flex flex-wrap items-center gap-3 self-start sm:self-auto">
+            <!-- Metric Toggle -->
+            <div class="flex items-center p-1 rounded-xl bg-slate-900/80 border border-slate-700/80 text-xs">
+              <button type="button" id="heatmap-metric-count" class="px-3 py-1.5 rounded-lg font-medium text-white bg-white/15 shadow-sm transition-colors">
+                Invoice Count
+              </button>
+              <button type="button" id="heatmap-metric-volume" class="px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition-colors">
+                Financing Vol. (₹)
+              </button>
+            </div>
+
+            <!-- Reset Filter Button (hidden by default) -->
+            <button type="button" id="heatmap-btn-reset-filter" class="hidden px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 text-xs font-semibold border border-emerald-500/30 transition-colors flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              <span>Reset Heatmap Filter</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Heatmap Visualization Grid & Risk Dimension Panel -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- D3 Heatmap Canvas Container (8 Cols) -->
+          <div class="lg:col-span-8 space-y-3">
+            <div id="d3-heatmap-container" class="w-full overflow-x-auto relative min-h-[300px] rounded-2xl bg-slate-950/70 p-4 border border-white/5">
+              <!-- D3 SVG injected here -->
+            </div>
+
+            <!-- Heatmap Color Scale Legend -->
+            <div class="flex flex-wrap items-center justify-between gap-3 text-[11px] text-slate-400 px-2">
+              <div class="flex items-center gap-2">
+                <span>Risk Spectrum:</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="w-3 h-3 rounded bg-emerald-500/30 border border-emerald-500/50"></span>
+                  <span class="text-emerald-300">Minimal / Low</span>
+                  <span class="w-3 h-3 rounded bg-amber-500/30 border border-amber-500/50 ml-2"></span>
+                  <span class="text-amber-300">Moderate</span>
+                  <span class="w-3 h-3 rounded bg-rose-500/40 border border-rose-500/60 ml-2"></span>
+                  <span class="text-rose-300">Elevated / Critical</span>
+                </div>
+              </div>
+              <div class="italic text-slate-500">
+                *Click any active cell to filter the application table below
+              </div>
+            </div>
+          </div>
+
+          <!-- Risk Dimension Insights Sidebar (4 Cols) -->
+          <div class="lg:col-span-4 space-y-4">
+            
+            <!-- Quick Summary Card -->
+            <div class="glass-panel-subtle rounded-2xl p-4 border border-white/10 space-y-3">
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Capital Exposure Split</span>
+              
+              <div class="space-y-2.5">
+                <div>
+                  <div class="flex items-center justify-between text-xs mb-1">
+                    <span class="text-emerald-400 flex items-center gap-1.5 font-medium">
+                      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      Low Risk (0–29)
+                    </span>
+                    <span id="heatmap-stat-low" class="font-bold text-white font-mono-numbers">₹0</span>
+                  </div>
+                  <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                    <div id="heatmap-bar-low" class="bg-emerald-400 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex items-center justify-between text-xs mb-1">
+                    <span class="text-amber-400 flex items-center gap-1.5 font-medium">
+                      <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                      Medium Risk (30–59)
+                    </span>
+                    <span id="heatmap-stat-med" class="font-bold text-white font-mono-numbers">₹0</span>
+                  </div>
+                  <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                    <div id="heatmap-bar-med" class="bg-amber-400 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex items-center justify-between text-xs mb-1">
+                    <span class="text-rose-400 flex items-center gap-1.5 font-medium">
+                      <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+                      High Risk (60–100)
+                    </span>
+                    <span id="heatmap-stat-high" class="font-bold text-white font-mono-numbers">₹0</span>
+                  </div>
+                  <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                    <div id="heatmap-bar-high" class="bg-rose-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Risk Category Heuristics Matrix Breakdown -->
+            <div class="glass-panel-subtle rounded-2xl p-4 border border-white/10 space-y-3">
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Key Risk Vulnerabilities</span>
+              
+              <div class="space-y-2 text-xs">
+                <div class="flex items-center justify-between py-1 border-b border-white/5">
+                  <span class="text-slate-300">Identity & Corporate Verification</span>
+                  <span class="text-emerald-400 font-semibold font-mono-numbers">100% Active GSTIN</span>
+                </div>
+                <div class="flex items-center justify-between py-1 border-b border-white/5">
+                  <span class="text-slate-300">3-Way Reconciliation (PO/POD)</span>
+                  <span class="text-amber-400 font-semibold font-mono-numbers">1 Price Mismatch</span>
+                </div>
+                <div class="flex items-center justify-between py-1 border-b border-white/5">
+                  <span class="text-slate-300">Bank Remittance Changes</span>
+                  <span class="text-rose-400 font-semibold font-mono-numbers">1 Account Tamper</span>
+                </div>
+                <div class="flex items-center justify-between py-1">
+                  <span class="text-slate-300">Double-Pledging Registry</span>
+                  <span class="text-rose-400 font-semibold font-mono-numbers">1 Multi-Lender Lien</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Ledger Controls & Filter Tabs -->
+      <section class="glass-panel-elevated rounded-3xl p-6 border border-white/10 space-y-5">
+        
+        <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+          
+          <!-- Search Bar -->
+          <div class="relative flex-1 max-w-md">
+            <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input type="text" id="filter-search" placeholder="Search by Invoice #, Seller, or Debtor Buyer..." class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-900/80 border border-slate-700/80 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-emerald-500 transition-colors" />
+          </div>
+
+          <!-- Segmented Filter Tabs -->
+          <div class="flex flex-wrap items-center gap-1.5 p-1 rounded-2xl bg-slate-900/80 border border-slate-700/80 text-xs">
+            <button type="button" class="tab-filter-btn px-3 py-1.5 rounded-xl font-medium text-white bg-white/10 shadow-sm" data-status="ALL">
+              All Invoices
+            </button>
+            <button type="button" class="tab-filter-btn px-3 py-1.5 rounded-xl font-medium text-slate-400 hover:text-white" data-status="Under Review">
+              Under Review
+            </button>
+            <button type="button" class="tab-filter-btn px-3 py-1.5 rounded-xl font-medium text-slate-400 hover:text-white" data-status="Approved">
+              Approved
+            </button>
+            <button type="button" class="tab-filter-btn px-3 py-1.5 rounded-xl font-medium text-slate-400 hover:text-white" data-status="Rejected">
+              Rejected
+            </button>
+            <button type="button" class="tab-filter-btn px-3 py-1.5 rounded-xl font-medium text-slate-400 hover:text-white" data-status="HIGH_RISK">
+              High Risk (≥60)
+            </button>
+          </div>
+
+          <!-- Risk Band Dropdown -->
+          <div class="flex items-center gap-2">
+            <label for="filter-risk" class="text-xs text-slate-400 font-medium shrink-0">Risk Score:</label>
+            <select id="filter-risk" class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-700/80 text-white text-xs focus:outline-none focus:border-emerald-500">
+              <option value="ALL">Any Score</option>
+              <option value="LOW">Low (0–29)</option>
+              <option value="MEDIUM">Medium (30–59)</option>
+              <option value="HIGH">High (60–100)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Batch Action Bar (shown when rows are selected) -->
+        <div id="batch-actions-bar" class="hidden p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2 text-emerald-300 font-medium">
+            <span id="batch-count">0</span> invoices selected
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" id="btn-batch-approve" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-colors">
+              Batch Approve
+            </button>
+            <button type="button" id="btn-batch-review" class="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold transition-colors">
+              Batch Escalate
+            </button>
+            <button type="button" id="btn-batch-clear" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 font-medium transition-colors">
+              Deselect All
+            </button>
+          </div>
+        </div>
+
+        <!-- Invoice Table -->
+        <div class="overflow-x-auto rounded-2xl border border-white/10">
+          <table class="w-full text-left text-xs table-glass">
+            <thead>
+              <tr class="bg-slate-900/80 text-slate-400 border-b border-white/10">
+                <th class="py-3 px-4 w-10 text-center">
+                  <input type="checkbox" id="checkbox-select-all" class="rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-0" />
+                </th>
+                <th class="py-3 px-4 font-semibold">Invoice Ref</th>
+                <th class="py-3 px-4 font-semibold">Seller Company</th>
+                <th class="py-3 px-4 font-semibold">Buyer (Debtor)</th>
+                <th class="py-3 px-4 font-semibold">Invoice Amount</th>
+                <th class="py-3 px-4 font-semibold">Requested (LTV)</th>
+                <th class="py-3 px-4 font-semibold text-center">Risk Score</th>
+                <th class="py-3 px-4 font-semibold text-center">Status</th>
+                <th class="py-3 px-4 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="invoice-table-tbody" class="divide-y divide-white/5 text-slate-300">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer / Count -->
+        <div class="flex items-center justify-between text-xs text-slate-400 pt-2">
+          <span id="table-display-count">Showing 0 invoices</span>
+          <span class="text-[11px] text-slate-500 font-mono-numbers">All currency metrics in Indian Rupee (INR ₹)</span>
+        </div>
+
+      </section>
+
+    </main>
+
+    <script src="/src/invoicetrust.js"></script>
+    <script>
+      let invoices = [];
+      let selectedIds = new Set();
+      let activeFilter = "ALL";
+      let activeRisk = "ALL";
+      let searchQuery = "";
+      let heatmapMetric = "count"; // "count" | "volume"
+      let activeHeatmapCell = null; // { riskMin, riskMax, amountMin, amountMax, riskLabel, amountLabel }
+
+      function formatShortINR(val) {
+        if (!val || val === 0) return "₹0";
+        if (val >= 10000000) return `₹${(val / 10000000).toFixed(2)} Cr`;
+        if (val >= 100000) return `₹${(val / 100000).toFixed(1)} L`;
+        return window.formatINR(val);
+      }
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        await loadDashboard();
+
+        // Search input
+        document.getElementById("filter-search").addEventListener("input", (e) => {
+          searchQuery = e.target.value.toLowerCase().trim();
+          renderTable();
+        });
+
+        // Tab buttons
+        document.querySelectorAll(".tab-filter-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            document.querySelectorAll(".tab-filter-btn").forEach(b => {
+              b.className = "tab-filter-btn px-3 py-1.5 rounded-xl font-medium text-slate-400 hover:text-white";
+            });
+            btn.className = "tab-filter-btn px-3 py-1.5 rounded-xl font-medium text-white bg-white/10 shadow-sm";
+            activeFilter = btn.dataset.status;
+            renderTable();
+          });
+        });
+
+        // Risk select
+        document.getElementById("filter-risk").addEventListener("change", (e) => {
+          activeRisk = e.target.value;
+          renderTable();
+        });
+
+        // Heatmap metric toggles
+        document.getElementById("heatmap-metric-count").addEventListener("click", () => {
+          heatmapMetric = "count";
+          document.getElementById("heatmap-metric-count").className = "px-3 py-1.5 rounded-lg font-medium text-white bg-white/15 shadow-sm transition-colors";
+          document.getElementById("heatmap-metric-volume").className = "px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition-colors";
+          renderRiskHeatmap();
+        });
+
+        document.getElementById("heatmap-metric-volume").addEventListener("click", () => {
+          heatmapMetric = "volume";
+          document.getElementById("heatmap-metric-volume").className = "px-3 py-1.5 rounded-lg font-medium text-white bg-white/15 shadow-sm transition-colors";
+          document.getElementById("heatmap-metric-count").className = "px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition-colors";
+          renderRiskHeatmap();
+        });
+
+        // Reset heatmap filter button
+        document.getElementById("heatmap-btn-reset-filter").addEventListener("click", () => {
+          activeHeatmapCell = null;
+          document.getElementById("heatmap-btn-reset-filter").classList.add("hidden");
+          renderRiskHeatmap();
+          renderTable();
+          window.showToast("Heatmap quadrant filter reset", "success");
+        });
+
+        // Select all checkbox
+        document.getElementById("checkbox-select-all").addEventListener("change", (e) => {
+          const filtered = getFilteredInvoices();
+          if (e.target.checked) {
+            filtered.forEach(i => selectedIds.add(i.id));
+          } else {
+            selectedIds.clear();
+          }
+          updateBatchBar();
+          renderTableRows();
+        });
+
+        // Batch buttons
+        document.getElementById("btn-batch-clear").addEventListener("click", () => {
+          selectedIds.clear();
+          document.getElementById("checkbox-select-all").checked = false;
+          updateBatchBar();
+          renderTableRows();
+        });
+
+        document.getElementById("btn-batch-approve").addEventListener("click", () => executeBatchAction("APPROVE"));
+        document.getElementById("btn-batch-review").addEventListener("click", () => executeBatchAction("REVIEW"));
+
+        // CSV export
+        document.getElementById("btn-export-csv").addEventListener("click", exportCSV);
+      });
+
+      async function loadDashboard() {
+        invoices = await window.InvoiceTrustDB.getAll();
+        updateKpis();
+        renderRiskHeatmap();
+        renderTable();
+      }
+
+      function updateKpis() {
+        const total = invoices.length;
+        const review = invoices.filter(i => i.status === "Under Review").length;
+        const approved = invoices.filter(i => i.status === "Approved").length;
+        const rejected = invoices.filter(i => i.status === "Rejected").length;
+        const highRisk = invoices.filter(i => i.riskScore >= 60).length;
+        const totalVolume = invoices.reduce((acc, cur) => acc + (cur.requestedAmount || 0), 0);
+
+        document.getElementById("kpi-total").textContent = total;
+        document.getElementById("kpi-review").textContent = review;
+        document.getElementById("kpi-approved").textContent = approved;
+        document.getElementById("kpi-rejected").textContent = rejected;
+        document.getElementById("kpi-high-risk").textContent = highRisk;
+        document.getElementById("kpi-volume").textContent = window.formatINR(totalVolume);
+      }
+
+      function renderRiskHeatmap() {
+        const container = document.getElementById("d3-heatmap-container");
+        if (!container || typeof d3 === "undefined") return;
+
+        // Calculate capital exposure stats for sidebar
+        const lowVol = invoices.filter(i => i.riskScore < 30).reduce((a, c) => a + (c.requestedAmount || 0), 0);
+        const medVol = invoices.filter(i => i.riskScore >= 30 && i.riskScore < 60).reduce((a, c) => a + (c.requestedAmount || 0), 0);
+        const highVol = invoices.filter(i => i.riskScore >= 60).reduce((a, c) => a + (c.requestedAmount || 0), 0);
+        const totalVol = lowVol + medVol + highVol || 1;
+
+        document.getElementById("heatmap-stat-low").textContent = window.formatINR(lowVol);
+        document.getElementById("heatmap-stat-med").textContent = window.formatINR(medVol);
+        document.getElementById("heatmap-stat-high").textContent = window.formatINR(highVol);
+
+        document.getElementById("heatmap-bar-low").style.width = `${Math.round((lowVol / totalVol) * 100)}%`;
+        document.getElementById("heatmap-bar-med").style.width = `${Math.round((medVol / totalVol) * 100)}%`;
+        document.getElementById("heatmap-bar-high").style.width = `${Math.round((highVol / totalVol) * 100)}%`;
+
+        // Grid dimensions
+        const riskBands = [
+          { label: "Minimal", range: "0–19", min: 0, max: 19, riskLevel: "low" },
+          { label: "Low", range: "20–39", min: 20, max: 39, riskLevel: "low" },
+          { label: "Moderate", range: "40–59", min: 40, max: 59, riskLevel: "med" },
+          { label: "Elevated", range: "60–79", min: 60, max: 79, riskLevel: "high" },
+          { label: "Critical", range: "80–100", min: 80, max: 100, riskLevel: "high" }
+        ];
+
+        const amountTiers = [
+          { label: "Enterprise", range: "> ₹50L", min: 5000000, max: Infinity },
+          { label: "Mid-Market", range: "₹20L–₹50L", min: 2000000, max: 4999999 },
+          { label: "Micro/Small", range: "< ₹20L", min: 0, max: 1999999 }
+        ];
+
+        // Clear existing SVG
+        container.innerHTML = "";
+
+        const width = 640;
+        const height = 240;
+        const margin = { top: 38, right: 16, bottom: 10, left: 140 };
+
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+
+        const colWidth = innerWidth / riskBands.length;
+        const rowHeight = innerHeight / amountTiers.length;
+
+        const svg = d3.select(container)
+          .append("svg")
+          .attr("viewBox", `0 0 ${width} ${height}`)
+          .attr("class", "w-full h-auto");
+
+        // Tooltip container
+        let tooltip = d3.select("#d3-heatmap-tooltip");
+        if (tooltip.empty()) {
+          tooltip = d3.select("body")
+            .append("div")
+            .attr("id", "d3-heatmap-tooltip")
+            .attr("class", "fixed z-50 pointer-events-none opacity-0 transition-opacity duration-150 glass-panel-elevated p-3 rounded-2xl border border-white/20 text-xs shadow-2xl");
+        }
+
+        const g = svg.append("g")
+          .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+        // Column Headers (Top)
+        riskBands.forEach((band, i) => {
+          const colG = g.append("g")
+            .attr("transform", `translate(${i * colWidth + colWidth / 2}, -16)`);
+
+          colG.append("text")
+            .attr("text-anchor", "middle")
+            .attr("class", `text-[11px] font-semibold ${band.riskLevel === 'low' ? 'fill-emerald-400' : band.riskLevel === 'med' ? 'fill-amber-400' : 'fill-rose-400'}`)
+            .text(band.label);
+
+          colG.append("text")
+            .attr("text-anchor", "middle")
+            .attr("y", 12)
+            .attr("class", "text-[9px] fill-slate-400 font-mono")
+            .text(band.range);
+        });
+
+        // Row Headers (Left)
+        amountTiers.forEach((tier, j) => {
+          const rowG = svg.append("g")
+            .attr("transform", `translate(${margin.left - 12}, ${margin.top + j * rowHeight + rowHeight / 2 - 4})`);
+
+          rowG.append("text")
+            .attr("text-anchor", "end")
+            .attr("class", "text-[11px] font-semibold fill-white")
+            .text(tier.label);
+
+          rowG.append("text")
+            .attr("text-anchor", "end")
+            .attr("y", 14)
+            .attr("class", "text-[10px] fill-slate-400 font-mono")
+            .text(tier.range);
+        });
+
+        // Build matrix cells
+        amountTiers.forEach((tier, j) => {
+          riskBands.forEach((band, i) => {
+            const matchingInvoices = invoices.filter(inv => {
+              const matchRisk = inv.riskScore >= band.min && inv.riskScore <= band.max;
+              const matchAmt = inv.requestedAmount >= tier.min && inv.requestedAmount <= tier.max;
+              return matchRisk && matchAmt;
+            });
+
+            const count = matchingInvoices.length;
+            const volume = matchingInvoices.reduce((acc, c) => acc + (c.requestedAmount || 0), 0);
+
+            const isSelected = activeHeatmapCell &&
+              activeHeatmapCell.riskMin === band.min &&
+              activeHeatmapCell.amountMin === tier.min;
+
+            const cellX = i * colWidth + 4;
+            const cellY = j * rowHeight + 4;
+            const cellW = colWidth - 8;
+            const cellH = rowHeight - 8;
+
+            const cellG = g.append("g")
+              .attr("class", "cursor-pointer transition-transform")
+              .attr("transform", `translate(${cellX}, ${cellY})`);
+
+            // Determine background color & border
+            let fillColor = "rgba(255, 255, 255, 0.02)";
+            let strokeColor = "rgba(255, 255, 255, 0.07)";
+
+            if (count > 0) {
+              if (band.riskLevel === "low") {
+                fillColor = "rgba(16, 185, 129, 0.22)";
+                strokeColor = "rgba(16, 185, 129, 0.5)";
+              } else if (band.riskLevel === "med") {
+                fillColor = "rgba(245, 158, 11, 0.24)";
+                strokeColor = "rgba(245, 158, 11, 0.55)";
+              } else {
+                fillColor = "rgba(244, 63, 94, 0.28)";
+                strokeColor = "rgba(244, 63, 94, 0.65)";
+              }
+            }
+
+            if (isSelected) {
+              strokeColor = "#FFFFFF";
+            }
+
+            // Cell rectangle
+            const rect = cellG.append("rect")
+              .attr("width", cellW)
+              .attr("height", cellH)
+              .attr("rx", 10)
+              .attr("ry", 10)
+              .attr("fill", fillColor)
+              .attr("stroke", strokeColor)
+              .attr("stroke-width", isSelected ? 2.5 : 1)
+              .attr("class", "transition-all duration-200");
+
+            // Primary Text in Cell
+            cellG.append("text")
+              .attr("x", cellW / 2)
+              .attr("y", count > 0 ? cellH / 2 - 3 : cellH / 2 + 4)
+              .attr("text-anchor", "middle")
+              .attr("class", `text-xs font-bold font-mono ${count > 0 ? 'fill-white' : 'fill-slate-600'}`)
+              .text(count === 0 ? "—" : (heatmapMetric === "count" ? `${count} ${count === 1 ? 'Loan' : 'Loans'}` : formatShortINR(volume)));
+
+            // Secondary Subtext in Cell
+            if (count > 0) {
+              cellG.append("text")
+                .attr("x", cellW / 2)
+                .attr("y", cellH / 2 + 13)
+                .attr("text-anchor", "middle")
+                .attr("class", `text-[10px] font-mono ${band.riskLevel === 'low' ? 'fill-emerald-300' : band.riskLevel === 'med' ? 'fill-amber-300' : 'fill-rose-300'}`)
+                .text(heatmapMetric === "count" ? formatShortINR(volume) : `${count} ${count === 1 ? 'Loan' : 'Loans'}`);
+            }
+
+            // Hover effects & Tooltip
+            cellG.on("mouseenter", (event) => {
+              rect.attr("stroke-width", 2)
+                .attr("filter", "brightness(1.3)");
+
+              if (count > 0) {
+                const invoicesList = matchingInvoices.map(inv =>
+                  `<div class="flex items-center justify-between gap-4 py-0.5 font-mono text-[11px]">
+                     <span class="text-white font-semibold">${inv.invoiceNumber} (${inv.sellerName})</span>
+                     <span class="text-emerald-300">${formatShortINR(inv.requestedAmount)}</span>
+                   </div>`
+                ).join("");
+
+                tooltip.html(`
+                  <div class="space-y-1.5 min-w-[220px]">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-1">
+                      <span class="font-bold text-white">${band.label} Risk · ${tier.label}</span>
+                      <span class="text-xs font-mono font-semibold text-emerald-400">${count} ${count === 1 ? 'Loan' : 'Loans'}</span>
+                    </div>
+                    <div class="text-[11px] text-slate-300">Total Exposure: <span class="font-mono text-white font-bold">${window.formatINR(volume)}</span></div>
+                    <div class="pt-1 border-t border-white/5 space-y-0.5">
+                      ${invoicesList}
+                    </div>
+                    <div class="text-[10px] text-emerald-300 pt-1 border-t border-white/10 font-medium">
+                      ${isSelected ? '✓ Quadrant active (Click to reset)' : '⚡ Click to filter application table'}
+                    </div>
+                  </div>
+                `)
+                .style("opacity", 1)
+                .style("left", `${Math.min(event.pageX + 12, window.innerWidth - 260)}px`)
+                .style("top", `${event.pageY - 40}px`);
+              }
+            })
+            .on("mousemove", (event) => {
+              if (count > 0) {
+                tooltip
+                  .style("left", `${Math.min(event.pageX + 12, window.innerWidth - 260)}px`)
+                  .style("top", `${event.pageY - 40}px`);
+              }
+            })
+            .on("mouseleave", () => {
+              rect.attr("stroke-width", isSelected ? 2.5 : 1)
+                .attr("filter", null);
+              tooltip.style("opacity", 0);
+            })
+            .on("click", () => {
+              if (count === 0) return;
+
+              if (isSelected) {
+                activeHeatmapCell = null;
+                document.getElementById("heatmap-btn-reset-filter").classList.add("hidden");
+              } else {
+                activeHeatmapCell = {
+                  riskMin: band.min,
+                  riskMax: band.max,
+                  amountMin: tier.min,
+                  amountMax: tier.max,
+                  riskLabel: band.label,
+                  amountLabel: tier.label
+                };
+                document.getElementById("heatmap-btn-reset-filter").classList.remove("hidden");
+                window.showToast(`Filtered by ${band.label} Risk & ${tier.label} Tier`, "success");
+              }
+
+              renderRiskHeatmap();
+              renderTable();
+            });
+          });
+        });
+      }
+
+      function getFilteredInvoices() {
+        return invoices.filter(inv => {
+          // Heatmap quadrant filter
+          if (activeHeatmapCell) {
+            if (inv.riskScore < activeHeatmapCell.riskMin || inv.riskScore > activeHeatmapCell.riskMax) {
+              return false;
+            }
+            if (inv.requestedAmount < activeHeatmapCell.amountMin || inv.requestedAmount > activeHeatmapCell.amountMax) {
+              return false;
+            }
+          }
+
+          // Status filter
+          if (activeFilter === "HIGH_RISK") {
+            if (inv.riskScore < 60) return false;
+          } else if (activeFilter !== "ALL") {
+            if (inv.status !== activeFilter) return false;
+          }
+
+          // Risk filter
+          if (activeRisk === "LOW" && inv.riskScore >= 30) return false;
+          if (activeRisk === "MEDIUM" && (inv.riskScore < 30 || inv.riskScore >= 60)) return false;
+          if (activeRisk === "HIGH" && inv.riskScore < 60) return false;
+
+          // Search query
+          if (searchQuery) {
+            const num = (inv.invoiceNumber || "").toLowerCase();
+            const seller = (inv.sellerName || "").toLowerCase();
+            const buyer = (inv.buyerName || "").toLowerCase();
+            if (!num.includes(searchQuery) && !seller.includes(searchQuery) && !buyer.includes(searchQuery)) {
+              return false;
+            }
+          }
+
+          return true;
+        });
+      }
+
+      function renderTable() {
+        renderTableRows();
+      }
+
+      function renderTableRows() {
+        const tbody = document.getElementById("invoice-table-tbody");
+        tbody.innerHTML = "";
+        const filtered = getFilteredInvoices();
+
+        document.getElementById("table-display-count").textContent = `Showing ${filtered.length} of ${invoices.length} invoices`;
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="9" class="py-12 text-center text-slate-400">
+                <svg class="w-8 h-8 mx-auto mb-2 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="text-sm font-semibold text-slate-300">No invoices match selected criteria</div>
+                <div class="text-xs text-slate-500 mt-0.5">Try clearing filters or search queries</div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        filtered.forEach(inv => {
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-white/[0.03] transition-colors";
+
+          const isSelected = selectedIds.has(inv.id);
+          const score = inv.riskScore;
+
+          let scoreBadge = "";
+          if (score >= 60) {
+            scoreBadge = `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 font-mono-numbers">${score} / 100</span>`;
+          } else if (score >= 30) {
+            scoreBadge = `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono-numbers">${score} / 100</span>`;
+          } else {
+            scoreBadge = `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono-numbers">${score} / 100</span>`;
+          }
+
+          let statusBadge = "";
+          if (inv.status === "Approved") {
+            statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">Approved</span>`;
+          } else if (inv.status === "Rejected") {
+            statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/15 text-rose-400 border border-rose-500/20">Rejected</span>`;
+          } else {
+            statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/20">Under Review</span>`;
+          }
+
+          tr.innerHTML = `
+            <td class="py-3.5 px-4 text-center">
+              <input type="checkbox" class="row-checkbox rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-0" data-id="${inv.id}" ${isSelected ? 'checked' : ''} />
+            </td>
+            <td class="py-3.5 px-4 font-semibold text-white">
+              <a href="result.html?id=${encodeURIComponent(inv.id)}" class="hover:text-emerald-400 transition-colors font-mono-numbers">
+                ${inv.invoiceNumber}
+              </a>
+              <div class="text-[10px] text-slate-500 font-mono-numbers">${new Date(inv.createdAt).toLocaleDateString()}</div>
+            </td>
+            <td class="py-3.5 px-4">
+              <div class="text-white font-medium truncate max-w-[160px]">${inv.sellerName}</div>
+              <div class="text-[10px] text-slate-500 font-mono-numbers">${inv.sellerGstin || 'GSTIN OK'}</div>
+            </td>
+            <td class="py-3.5 px-4">
+              <div class="text-slate-300 truncate max-w-[150px]">${inv.buyerName}</div>
+            </td>
+            <td class="py-3.5 px-4 font-mono-numbers font-semibold text-white">
+              ${window.formatINR(inv.invoiceAmount)}
+            </td>
+            <td class="py-3.5 px-4 font-mono-numbers font-medium text-emerald-400">
+              ${window.formatINR(inv.requestedAmount)}
+            </td>
+            <td class="py-3.5 px-4 text-center">
+              ${scoreBadge}
+            </td>
+            <td class="py-3.5 px-4 text-center">
+              ${statusBadge}
+            </td>
+            <td class="py-3.5 px-4 text-right">
+              <div class="flex items-center justify-end gap-1.5">
+                <a href="result.html?id=${encodeURIComponent(inv.id)}" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-white text-xs font-medium transition-colors">
+                  Report
+                </a>
+                <a href="audit.html?id=${encodeURIComponent(inv.id)}" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-medium transition-colors" title="Audit Trail">
+                  Audit
+                </a>
+              </div>
+            </td>
+          `;
+
+          // Checkbox listener
+          const checkbox = tr.querySelector(".row-checkbox");
+          checkbox.addEventListener("change", (e) => {
+            if (e.target.checked) {
+              selectedIds.add(inv.id);
+            } else {
+              selectedIds.delete(inv.id);
+            }
+            updateBatchBar();
+          });
+
+          tbody.appendChild(tr);
+        });
+      }
+
+      function updateBatchBar() {
+        const bar = document.getElementById("batch-actions-bar");
+        const countEl = document.getElementById("batch-count");
+        if (selectedIds.size > 0) {
+          bar.classList.remove("hidden");
+          countEl.textContent = selectedIds.size;
+        } else {
+          bar.classList.add("hidden");
+        }
+      }
+
+      async function executeBatchAction(action) {
+        if (selectedIds.size === 0) return;
+        for (const id of selectedIds) {
+          await window.InvoiceTrustDB.recordDecision(id, action, `Batch ${action} executed from Lender Dashboard.`);
+        }
+        window.showToast(`Batch ${action} applied to ${selectedIds.size} invoices`, "success");
+        selectedIds.clear();
+        updateBatchBar();
+        await loadDashboard();
+      }
+
+      function exportCSV() {
+        const filtered = getFilteredInvoices();
+        if (filtered.length === 0) {
+          window.showToast("No invoices to export", "warning");
+          return;
+        }
+
+        const headers = ["Invoice Number", "Date", "Seller", "Buyer", "Invoice Amount (INR)", "Requested Financing (INR)", "Risk Score", "Status", "Decision"];
+        const rows = filtered.map(i => [
+          `"${i.invoiceNumber}"`,
+          `"${i.createdAt}"`,
+          `"${i.sellerName}"`,
+          `"${i.buyerName}"`,
+          i.invoiceAmount,
+          i.requestedAmount,
+          i.riskScore,
+          `"${i.status}"`,
+          `"${i.decision}"`
+        ]);
+
+        const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `InvoiceTrust_Ledger_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.showToast("CSV Exported successfully", "success");
+      }
+    </script>
+  </body>
+</html>
